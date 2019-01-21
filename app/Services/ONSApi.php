@@ -70,7 +70,7 @@ class ONSApi extends AbstractApi {
 	 * @param Function $callback
 	 * @return Object|Array|Boolean
 	 */
-	private function _getId($url)
+	private function _getIdFromUrl($url)
 	{
 		return preg_replace(".*\/id\/[a-z\-]*\/", "", $url);
 	}
