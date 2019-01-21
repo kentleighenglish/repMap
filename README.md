@@ -1,9 +1,8 @@
-
 This is the Repository Map root directory, please be sure to check the documentation below.
 
 _(Mostly work in progress right now)_
 
-#Table Of Contents
+# Table Of Contents
 
 1. Site Structure and Functionality
 	1. Models
