@@ -4,8 +4,17 @@ namespace RepMap\Http\Controllers;
 
 use RepMap\Http\Controllers\Controller;
 
+use RepMap\Services\SyncService;
+
 class PageController extends Controller
 {
+
+	public $sync;
+
+	public function __construct(SyncService $sync)
+	{
+		$this->sync = $sync;
+	}
 
 	/**
 	 * Show the index of the website
@@ -14,6 +23,8 @@ class PageController extends Controller
 	 */
 	public function index()
 	{
+		$this->sync->updateCounties();
+
 		return view('index');
 	}
 

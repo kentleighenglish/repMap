@@ -18,7 +18,7 @@ class CreateIssuesTable extends Migration
             $table->string('name');
             $table->string('issue_method');
             $table->string('issue_value', 255);
-            $table->float('representation');
+            $table->float('representation')->nullable(true);
             $table->timestamps();
         });
     }

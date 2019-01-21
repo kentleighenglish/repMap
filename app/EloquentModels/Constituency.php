@@ -16,6 +16,6 @@ class Constituency extends Model
     /**
      * @var array
      */
-    protected $fillable = [ 'county_id', 'name', 'type', 'gsscode', 'geojson', 'representation' ];
+    protected $fillable = [ 'county_id', 'name', 'cty16cd', 'geojson', 'representation' ];
 
 }

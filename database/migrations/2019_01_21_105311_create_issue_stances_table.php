@@ -18,11 +18,11 @@ class CreateIssueStancesTable extends Migration
 			$table->unsignedInteger('constituency_id');
             $table->unsignedInteger('member_id');
             $table->unsignedInteger('issue_id');
-            $table->unsignedInteger('electorate');
-            $table->unsignedInteger('turnout');
-            $table->unsignedTinyInteger('member_representing');
-            $table->string('member_stance', 255);
-            $table->string('constituency_stance', 255);
+            $table->unsignedInteger('electorate')->nullable(true);
+            $table->unsignedInteger('turnout')->nullable(true);
+            $table->unsignedTinyInteger('member_representing')->nullable(true);
+            $table->string('member_stance', 255)->nullable(true);
+            $table->string('constituency_stance', 255)->nullable(true);
             $table->timestamps();
 
 			$table->foreign('constituency_id')->references('id')->on('constituencies');

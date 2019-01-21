@@ -18,10 +18,10 @@ class CreateMembersTable extends Migration
             $table->string('fullname');
             $table->unsignedInteger('party_id');
             $table->unsignedInteger('constituency_id');
-            $table->string('webpage', 255);
-            $table->string('twitter', 255);
-            $table->unsignedTinyInteger('elected');
-            $table->float('representation');
+            $table->string('webpage', 255)->nullable(true);
+            $table->string('twitter', 255)->nullable(true);
+            $table->unsignedTinyInteger('elected')->nullable(true);
+            $table->float('representation')->nullable(true);
             $table->timestamps();
 
 			$table->foreign('party_id')->references('id')->on('parties');

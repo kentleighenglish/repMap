@@ -7,7 +7,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 
-class UniverseApi extends AbstractApi {
+class ParliamentApi extends AbstractApi {
 
 	public function __construct()
 	{
@@ -28,13 +28,14 @@ class UniverseApi extends AbstractApi {
 	/**
 	 * Fetches a candidate from Universe API
 	 *
-	 * @param String $id
-	 * @return \StafflineCep\Http\Resources\Candidate
+	 * @return Array
 	 */
 	public function getActiveConstituencies()
 	{
 		return $this->_handleResponse($this->get('constituencies.json?_pageSize=650&humanIndexable&exists-endedDate=false'), function($data) {
-			var_dump($data);
+			$result = $data['result'];
+
+			return $result->items;
 		});
 	}
 

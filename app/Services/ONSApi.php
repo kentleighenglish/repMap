@@ -9,8 +9,24 @@ use Illuminate\Support\Facades\Request;
 
 class ONSApi extends AbstractApi {
 
-	public $props = [
-		"within" => "http://publishmydata.com/def/ontology/spatial/within"
+	public $propMap = [
+		"constituencies" => [
+			"http://publishmydata.com/def/ontology/spatial/within" => [
+				"newKey" => "within",
+				"propKey" => "@id",
+				"resource" => true
+			],
+			"http://www.w3.org/2004/02/skos/core#notation" => [
+				"newKey" => "cty16cd",
+				"propKey" => "@value",
+				"resource" => false
+			],
+			"http://statistics.data.gov.uk/def/statistical-geography#officialname" => [
+				"newKey" => "name",
+				"propKey" => "@value",
+				"resource" => false
+			]
+		]
 	];
 
 	public function __construct()
@@ -19,8 +35,6 @@ class ONSApi extends AbstractApi {
 
 		$this->config['host'] = 'http://statistics.data.gov.uk/';
 
-		$this->config['prefix'] = '';
-
 		$this->config['jsonEncode'] = true;
 
 		$this->config['headers'] = [
@@ -28,6 +42,57 @@ class ONSApi extends AbstractApi {
 		];
 	}
 
+	/**
+	 * Fetches all active counties from England, Wales, Scotland, and North Ireland
+	 *
+	 * @return Array
+	 */
+	public function getActiveCounties()
+	{
+		$areas = [
+			'E10',
+			'N07',
+			'S15',
+			'W08'
+		];
+
+		$results = [];
+		foreach ($areas as $a) {
+			$url = "area_collection.json?per_page=50&in_collection=".$this->_genResourceUrl("def/geography/collection/${a}");
+
+			$results = array_merge($results, $this->_handleResponse($this->get($url), function($data) {
+				return array_map(function($a) { return $this->_mapKeys($a); }, $data);
+			}));
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Fetches all active constituencies from England, Wales, Scotland, and North Ireland
+	 *
+	 * @return Array
+	 */
+	public function getActiveConstituencies()
+	{
+		$areas = [
+			'E14',
+			'N06',
+			'S14',
+			'W07'
+		];
+
+		$results = [];
+		foreach ($areas as $a) {
+			$url = "area_collection.json?per_page=650&in_collection=".$this->_genResourceUrl("def/geography/collection/${a}");
+
+			$results = array_merge($results, $this->_handleResponse($this->get($url), function($data) {
+				return array_map(function($a) { return $this->_mapKeys($a); }, $data);
+			}));
+		}
+
+		return $results;
+	}
 
 	/**
 	 * Fetches a candidate from Universe API
@@ -37,7 +102,7 @@ class ONSApi extends AbstractApi {
 	 */
 	public function getCounty($code)
 	{
-		return $this->_handleResponse($this->get($this->genResourceUrl("statistical-geography/${code}")), function($data) {
+		return $this->_handleResponse($this->get($this->_genResourceUrl("statistical-geography/${code}")), function($data) {
 			var_dump($data);
 		});
 	}
@@ -72,7 +137,7 @@ class ONSApi extends AbstractApi {
 	 */
 	private function _getIdFromUrl($url)
 	{
-		return preg_replace(".*\/id\/[a-z\-]*\/", "", $url);
+		return preg_replace("/.*\/id\/[a-z\-]*\//", "", $url);
 	}
 
 	/**
@@ -85,6 +150,34 @@ class ONSApi extends AbstractApi {
 	private function _genResourceUrl($path)
 	{
 		return urlencode($this->config['host'].$path);
+	}
+
+	private function _mapKeys($item)
+	{
+		$response = [];
+
+		foreach($this->propMap as $key => $map) {
+			if (isset($item->$key)) {
+				$value = $item->$key;
+				while (!is_string($value)) {
+					if (is_array($value) && count($value)) {
+						$value = $value[0];
+					} elseif (is_object($value)) {
+						$v = $map['propKey'];
+						$value = isset($value->$v) ? $value->$v : false;
+					} else {
+						$value = false;
+						break;
+					}
+				}
+
+				if ($value) {
+					$response[$map['newKey']] = $map['resource'] ? $this->_getIdFromUrl($value) : $value;
+				}
+			}
+		}
+
+		return (Object) $response;
 	}
 
 }

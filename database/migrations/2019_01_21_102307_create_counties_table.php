@@ -17,7 +17,7 @@ class CreateCountiesTable extends Migration
             $table->increments('id');
             $table->string('name', 255);
             $table->string('cty18cd', 16);
-            $table->float('representation');
+            $table->float('representation')->nullable(true);
             $table->timestamps();
         });
     }

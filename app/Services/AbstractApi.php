@@ -37,8 +37,9 @@ class AbstractApi {
 
 	protected function call($url, $method, $data = null, $multipart = false)
 	{
+		$host = isset($this->config['host']) ? $this->config['host'] : null;
 		$this->client = new Client([
-			'base_uri' => $this->config['host'],
+			'base_uri' => $host,
 			'http_errors' => false
 		]);
 
@@ -46,7 +47,7 @@ class AbstractApi {
 			$url = $this->config['prefix'].$url;
 		}
 
-		Log::debug("Calling ${url}");
+		Log::debug("Calling ${host}${url}");
 		Log::debug("Body: ".json_encode($data));
 		$options = [
 			'headers' => $this->config['headers']
