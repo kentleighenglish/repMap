@@ -28,4 +28,9 @@ class Member extends Model
 			return $this->belongsTo('RepMap\EloquentModels\Constituency');
 		}
 
+		public function issueStances()
+		{
+			return $this->hasMany('RepMap\EloquentModels\IssueStance');
+		}
+
 }

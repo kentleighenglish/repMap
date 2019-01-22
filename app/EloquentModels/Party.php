@@ -18,4 +18,9 @@ class Party extends Model
 	     */
 	    protected $fillable = [ 'name', 'colour', 'representation' ];
 
+		public function members()
+		{
+			return $this->hasMany('RepMap\EloquentModels\Member');
+		}
+
 }

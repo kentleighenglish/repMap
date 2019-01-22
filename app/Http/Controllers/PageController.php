@@ -24,7 +24,8 @@ class PageController extends Controller
 	public function index()
 	{
 		// $this->sync->updateCounties();
-		$this->sync->updateConstituencies();
+		// $this->sync->updateConstituencies();
+		$this->sync->updateMembers();
 
 		return view('index');
 	}

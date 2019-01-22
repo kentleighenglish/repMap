@@ -18,4 +18,10 @@ class Issue extends Model
 	     */
 	    protected $fillable = [ 'name', 'representation' ];
 
+
+		public function issueStances()
+		{
+			return $this->hasMany('RepMap\EloquentModels\IssueStance');
+		}
+
 }

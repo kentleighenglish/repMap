@@ -118,7 +118,7 @@ class ONSApi extends AbstractApi {
 	 */
 	private function _handleResponse($response, $callback)
 	{
-		Log::debug('API Response: '.json_encode($response));
+		// Log::debug('API Response: '.json_encode($response));
 		if ($response['statusCode'] === 200) {
 			return $callback($response['data']);
 		} else {

@@ -17,6 +17,7 @@ class CreatePartiesTable extends Migration
             $table->increments('id');
             $table->string('name', 255);
             $table->string('colour', 10)->nullable(true);
+			$table->unsignedInteger('members')->nullable(true);
             $table->float('representation')->nullable(true);
             $table->timestamps();
         });

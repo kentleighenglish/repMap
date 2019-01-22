@@ -4,6 +4,7 @@ namespace RepMap\Services;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class AbstractApi {
 
@@ -38,49 +39,63 @@ class AbstractApi {
 	protected function call($url, $method, $data = null, $multipart = false)
 	{
 		$host = isset($this->config['host']) ? $this->config['host'] : null;
-		$this->client = new Client([
-			'base_uri' => $host,
-			'http_errors' => false
-		]);
 
 		if (isset($this->config['prefix'])) {
 			$url = $this->config['prefix'].$url;
 		}
 
-		Log::debug("Calling ${host}${url}");
-		Log::debug("Body: ".json_encode($data));
-		$options = [
-			'headers' => $this->config['headers']
-		];
+		if (Cache::has($host.$url)) {
+			return [
+				"data" => Cache::get($host.$url),
+				"statusCode" => 200,
+				"statusText" => "OK"
+			];
 
-		if (isset($this->config['auth'])) {
-			$options['auth'] = [$this->config['auth']['username'], $this->config['auth']['password']];
-		}
+		} else {
+			$this->client = new Client([
+				'base_uri' => $host,
+				'http_errors' => false
+			]);
 
-		if ($data && !$multipart) {
-			if ($method === 'POST') {
-				$options['body'] = $data;
+			Log::debug("Calling ${host}${url}");
+			Log::debug("Body: ".json_encode($data));
+			$options = [
+				'headers' => $this->config['headers']
+			];
+
+			if (isset($this->config['auth'])) {
+				$options['auth'] = [$this->config['auth']['username'], $this->config['auth']['password']];
 			}
-		} elseif ($data && $multipart) {
-			$options['multipart'] = $data;
-			unset($options['headers']['Content-Type']);
+
+			if ($data && !$multipart) {
+				if ($method === 'POST') {
+					$options['body'] = $data;
+				}
+			} elseif ($data && $multipart) {
+				$options['multipart'] = $data;
+				unset($options['headers']['Content-Type']);
+			}
+
+			if ($this->config['jsonEncode'] && isset($options['body']) && $method === 'POST') {
+				$options['json'] = $options['body'];
+				unset($options['body']);
+				// $options['headers']['Content-Length'] = strlen(json_encode($options['body']));
+			}
+
+			$response = $this->client->request($method, $url, $options);
+
+			$contentLength = $response->getHeaderLine('Content-Length');
+			$contentType = $response->getHeaderLine('Content-Type');
+			$contentDisposition = $response->getHeaderLine('Content-Disposition');
+
+			$responseBody = (Array) json_decode($response->getBody()->getContents());
+			$statusCode = $response->getStatusCode();
+			$statusText = $response->getReasonPhrase();
+
+			if ($statusCode === 200 && $responseBody) {
+				Cache::put($host.$url, $responseBody, 120);
+			}
 		}
-
-		if ($this->config['jsonEncode'] && isset($options['body']) && $method === 'POST') {
-			$options['json'] = $options['body'];
-			unset($options['body']);
-			// $options['headers']['Content-Length'] = strlen(json_encode($options['body']));
-		}
-
-		$response = $this->client->request($method, $url, $options);
-
-		$contentLength = $response->getHeaderLine('Content-Length');
-		$contentType = $response->getHeaderLine('Content-Type');
-		$contentDisposition = $response->getHeaderLine('Content-Disposition');
-
-		$responseBody = (Array) json_decode($response->getBody()->getContents());
-		$statusCode = $response->getStatusCode();
-		$statusText = $response->getReasonPhrase();
 
 		return [
 			'data' => $responseBody,
