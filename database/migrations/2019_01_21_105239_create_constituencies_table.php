@@ -15,9 +15,9 @@ class CreateConstituenciesTable extends Migration
     {
         Schema::create('constituencies', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('county_id');
             $table->string('name', 255);
             $table->string('cty16cd', 16);
+			$table->unsignedInteger('county_id');
             $table->json('geojson')->nullable(true);
             $table->float('representation')->nullable(true);
             $table->timestamps();

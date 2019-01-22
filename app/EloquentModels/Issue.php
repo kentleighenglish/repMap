@@ -1,6 +1,6 @@
 <?php
 
-namespace RepMap;
+namespace RepMap\EloquentModels;
 
 use Illuminate\Database\Eloquent\Model;
 

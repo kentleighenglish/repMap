@@ -10,22 +10,20 @@ use Illuminate\Support\Facades\Request;
 class ONSApi extends AbstractApi {
 
 	public $propMap = [
-		"constituencies" => [
-			"http://publishmydata.com/def/ontology/spatial/within" => [
-				"newKey" => "within",
-				"propKey" => "@id",
-				"resource" => true
-			],
-			"http://www.w3.org/2004/02/skos/core#notation" => [
-				"newKey" => "cty16cd",
-				"propKey" => "@value",
-				"resource" => false
-			],
-			"http://statistics.data.gov.uk/def/statistical-geography#officialname" => [
-				"newKey" => "name",
-				"propKey" => "@value",
-				"resource" => false
-			]
+		"http://publishmydata.com/def/ontology/spatial/within" => [
+			"newKey" => "within",
+			"propKey" => "@id",
+			"resource" => true
+		],
+		"http://www.w3.org/2004/02/skos/core#notation" => [
+			"newKey" => "gsscode",
+			"propKey" => "@value",
+			"resource" => false
+		],
+		"http://statistics.data.gov.uk/def/statistical-geography#officialname" => [
+			"newKey" => "name",
+			"propKey" => "@value",
+			"resource" => false
 		]
 	];
 
@@ -50,7 +48,7 @@ class ONSApi extends AbstractApi {
 	public function getActiveCounties()
 	{
 		$areas = [
-			'E10',
+			'E15',
 			'N07',
 			'S15',
 			'W08'
@@ -155,6 +153,7 @@ class ONSApi extends AbstractApi {
 	private function _mapKeys($item)
 	{
 		$response = [];
+
 
 		foreach($this->propMap as $key => $map) {
 			if (isset($item->$key)) {

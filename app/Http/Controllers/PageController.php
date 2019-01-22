@@ -23,7 +23,8 @@ class PageController extends Controller
 	 */
 	public function index()
 	{
-		$this->sync->updateCounties();
+		// $this->sync->updateCounties();
+		$this->sync->updateConstituencies();
 
 		return view('index');
 	}

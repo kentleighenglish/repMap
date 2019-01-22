@@ -1,6 +1,6 @@
 <?php
 
-namespace RepMap;
+namespace RepMap\EloquentModels;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,5 +17,15 @@ class Member extends Model
 	     * @var array
 	     */
 	    protected $fillable = [ 'fullname', 'party_id', 'constituency_id', 'webpage', 'twitter', 'elected', 'representation' ];
+
+		public function party()
+		{
+			return $this->belongsTo('RepMap\EloquentModels\Party');
+		}
+
+		public function constituency()
+		{
+			return $this->belongsTo('RepMap\EloquentModels\Constituency');
+		}
 
 }
