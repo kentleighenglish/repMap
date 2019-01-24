@@ -2,6 +2,9 @@
 
 namespace RepMap\Services;
 
+use Carbon\Carbon;
+
+use RepMap\Services\AbstractApi;
 use RepMap\Services\ParliamentApi;
 use RepMap\Services\ONSApi;
 
@@ -28,9 +31,29 @@ class SyncService {
 		$this->ons = $ons;
 	}
 
-	public function updateGeojson()
+	public function updateGeoJson()
 	{
+		$api = new AbstractApi();
+
 		$url = config('props.geoJsonUrl');
+		$result = $api->get($url);
+
+		if ($result['statusCode'] === 200) {
+			$items = $result['data']['features'];
+
+			$constituencies = Constituency::all()->groupBy('cty16cd');
+
+			foreach($items as $item) {
+				$gsscode = $item->properties->pcon16cd;
+				if (isset($constituencies[$gsscode][0])) {
+					$constituencies[$gsscode][0]->geojson = json_encode($item->geometry);
+
+					$constituencies[$gsscode][0]->save();
+				}
+
+			}
+
+		}
 	}
 
 	/**
@@ -44,11 +67,15 @@ class SyncService {
 
 		$existing = County::all();
 
-		$parsedResults = array_reduce($results, function($arr, $item) use ($existing) {
+		$now = Carbon::now();
+
+		$parsedResults = array_reduce($results, function($arr, $item) use ($existing, $now) {
 			if (!$this->_searchCollection($existing, 'cty18cd', $item->gsscode)) {
 				$arr[] = [
 					'name' => $item->name,
-					'cty18cd' => $item->gsscode
+					'cty18cd' => $item->gsscode,
+					'created_at' => $now,
+					'updated_at' => $now
 				];
 			}
 
@@ -79,6 +106,8 @@ class SyncService {
 
 		$parsedResults = [];
 
+		$now = Carbon::now();
+
 
 		foreach($results as $item) {
 			if(!isset($item->within)) {
@@ -93,7 +122,9 @@ class SyncService {
 
 				$parsedResults[$item->within][] = [
 					'name' => $item->name,
-					'cty16cd' => $item->gsscode
+					'cty16cd' => $item->gsscode,
+					'created_at' => $now,
+					'updated_at' => $now
 				];
 			}
 		};
@@ -137,6 +168,8 @@ class SyncService {
 		// Get election results based on config
 		$electionId = config('props.lastGeneralElectionId');
 		$electionResults = $this->parliament->getElectionResults($electionId);
+
+		$now = Carbon::now();
 
 		$missing = [];
 		// Empty out arrays
@@ -186,8 +219,10 @@ class SyncService {
 			if (!isset($member['elected'])) {
 				$member['elected'] = false;
 			}
+			$member['created_at'] = $now;
+			$member['updated_at'] = $now;
 
-			$parsedResults[$member['party']][] = array_only($member, [ 'fullname', 'webpage', 'twitter', 'constituency_id', 'elected' ]);
+			$parsedResults[$member['party']][] = array_only($member, [ 'fullname', 'webpage', 'twitter', 'constituency_id', 'elected', 'created_at', 'updated_at' ]);
 
 		}
 
@@ -227,6 +262,8 @@ class SyncService {
 			}
 
 			$existingParty->members = count($membersResponse[$existingParty->id]);
+
+			$existingParty->save();
 		}
 
 		foreach($parties as $name => $members) {

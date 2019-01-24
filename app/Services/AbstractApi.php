@@ -17,21 +17,24 @@ class AbstractApi {
 		$this->config = [
 			'host' => '',
 			'prefix' => '',
-			'jsonEncode' => false
+			'jsonEncode' => false,
+			'headers' => [
+				'Content-Type' => 'application/json'
+			]
 		];
 	}
 
-	protected function post($url, $data)
+	public function post($url, $data)
 	{
 		return $this->call($url, 'POST', $data);
 	}
 
-	protected function multipartPost($url, $data)
+	public function multipartPost($url, $data)
 	{
 		return $this->call($url, 'POST', $data, true);
 	}
 
-	protected function get($url)
+	public function get($url)
 	{
 		return $this->call($url, 'GET');
 	}

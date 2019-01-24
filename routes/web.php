@@ -12,4 +12,5 @@
 */
 
 Route::get('/', 'PageController@index');
-Route::get('/*', 'PageController@index');
+
+Route::get('/{slug}', 'PageController@index');

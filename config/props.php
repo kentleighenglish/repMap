@@ -2,7 +2,7 @@
 
 return [
 	"lastGeneralElectionId" => "730039",
-	"geoJsonUrl" => "http://geoportal1-ons.opendata.arcgis.com/datasets/deeb99fdf09949bc8ed4dc95c80da279_4.geojson",
+	"geoJsonUrl" => "http://geoportal1-ons.opendata.arcgis.com/datasets/48d0b49ff7ec4ad0a4f7f8188f6143e8_3.geojson	",
 	"issueMethods" => [
 		"electoralResults" => [
 			"label" => "Electoral Results API",

@@ -25,7 +25,8 @@ class PageController extends Controller
 	{
 		// $this->sync->updateCounties();
 		// $this->sync->updateConstituencies();
-		$this->sync->updateMembers();
+		// $this->sync->updateMembers();
+		$this->sync->updateGeoJson();
 
 		return view('index');
 	}
