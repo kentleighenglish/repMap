@@ -11,6 +11,7 @@
 |
 */
 
+Route::get('/config', 'PageController@config');
 Route::get('/', 'PageController@index');
 
 Route::get('/{slug}', 'PageController@index');

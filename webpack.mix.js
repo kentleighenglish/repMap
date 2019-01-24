@@ -1,4 +1,7 @@
 const mix = require('laravel-mix');
+const path = require('path');
+
+require('laravel-mix-eslint');
 
 /*
  |--------------------------------------------------------------------------
@@ -11,7 +14,40 @@ const mix = require('laravel-mix');
  |
  */
 
+mix.disableNotifications();
+
+mix.webpackConfig({
+    resolve: {
+        alias: {
+			'app': path.resolve(__dirname, 'resources', 'js', 'app')
+        }
+    },
+	module: {
+		rules: [
+			{
+				test: /\.js?$/,
+				exclude: /node_modules/,
+				loader: 'babel-loader',
+				query: {
+					presets:[ 'env' ]
+				}
+			}
+		]
+	}
+});
+
 mix
-	.js('resources/js/app.js', 'public/js')
-	.sass('resources/sass/app.scss', 'public/css')
-	.disableNotifications();
+.eslint()
+.js('resources/js/app.js', 'public/js').version()
+.sass('resources/sass/app.scss', 'public/css').version()
+.options({
+	postCss: [
+		require('postcss-discard-comments')({
+			removeAll: true
+		})
+	]
+})
+.browserSync({
+	proxy: 'local.repmap.com',
+	open: 'ui'
+});

@@ -1,5 +1,63 @@
-body {
-  background: #191F21;
-  margin: 0;
+html,
+body{
+  height:100%;
+}
+
+body{
+  background:#191F21;
+  margin:0;
+}
+
+.container{
+  display:-webkit-box;
+  display:-ms-flexbox;
+  display:flex;
+  -webkit-box-orient:horizontal;
+  -webkit-box-direction:normal;
+      -ms-flex-direction:row;
+          flex-direction:row;
+  height:100%;
+}
+
+.container aside{
+  display:-webkit-box;
+  display:-ms-flexbox;
+  display:flex;
+  -webkit-box-orient:vertical;
+  -webkit-box-direction:normal;
+      -ms-flex-direction:column;
+          flex-direction:column;
+  width:10%;
+}
+
+.container section.mapContainer{
+  display:-webkit-box;
+  display:-ms-flexbox;
+  display:flex;
+  -webkit-box-orient:vertical;
+  -webkit-box-direction:normal;
+      -ms-flex-direction:column;
+          flex-direction:column;
+  width:90%;
+  -webkit-box-pack:center;
+      -ms-flex-pack:center;
+          justify-content:center;
+  -webkit-box-align:center;
+      -ms-flex-align:center;
+          align-items:center;
+}
+
+.map__constituency{
+  stroke:#374549;
+  stroke-width:.2;
+  cursor:pointer;
+}
+
+.map__constituency:hover{
+  fill-opacity:.7;
+}
+
+.map__constituency--active{
+  fill:#FF0000;
 }
 

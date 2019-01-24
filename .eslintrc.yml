@@ -1,0 +1,24 @@
+parserOptions:
+  ecmaVersion: 6
+  ecmaFeatures:
+    spread: true
+    experimentalObjectRestSpread: true
+
+
+env:
+  browser: true
+  es6: true
+  node: true
+
+extends:
+  - "eslint:recommended"
+
+rules:
+  "flowtype/no-types-missing-file-annotation": 0
+  "no-unused-vars": 1
+  "no-console": 1
+  "no-trailing-spaces": 1
+  "no-extra-boolean-cast": 0
+
+globals:
+  "EventEmitter": true

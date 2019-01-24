@@ -9,6 +9,8 @@ use RepMap\Services\ParliamentApi;
 use RepMap\Services\ONSApi;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 use RepMap\EloquentModels\County;
 use RepMap\EloquentModels\Constituency;
 use RepMap\EloquentModels\Member;
@@ -271,8 +273,11 @@ class SyncService {
 				continue;
 			}
 
+			$colour = config('props.partyColours.'.$name, null);
+
 			$newParty = new Party([
 				'name' => $name,
+				'colour' => $colour,
 				'members' => count($members)
 			]);
 

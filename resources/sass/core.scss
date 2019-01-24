@@ -1,5 +1,47 @@
 
+html, body {
+	height: 100%;
+}
+
 body {
 	background: #191F21;
 	margin: 0;
+}
+
+.container {
+	display: flex;
+	flex-direction: row;
+	height: 100%;
+
+	aside {
+		display: flex;
+		flex-direction: column;
+		width: 10%;
+	}
+
+	section.mapContainer {
+		display: flex;
+		flex-direction: column;
+		width: 90%;
+
+		justify-content: center;
+		align-items: center;
+	}
+}
+
+
+.map {
+	&__constituency {
+		stroke: #374549;
+		stroke-width: .2;
+		cursor: pointer;
+
+		&:hover {
+			fill-opacity: .7;
+		}
+
+		&--active {
+			fill: #FF0000;
+		}
+	}
 }

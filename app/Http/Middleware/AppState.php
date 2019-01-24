@@ -20,6 +20,8 @@ class AppState
 		$state  = [];
 
 		$data = Constituency::all()
+		->sortBy('name')
+		->values()
 		->load([
 			'county',
 			'members' => function($query) {
