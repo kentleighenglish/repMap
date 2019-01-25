@@ -4,7 +4,10 @@ body{
 }
 
 body{
-  background:#191F21;
+  background:#202628;
+  color:#C2CCD1;
+  font-family:sans-serif;
+  font-size:14px;
   margin:0;
 }
 
@@ -53,16 +56,19 @@ body{
 }
 
 .map__constituency{
-  stroke:#374549;
-  stroke-width:.2;
+  stroke:#2B3233;
+  stroke-width:.5;
   cursor:pointer;
+  fill-opacity:.4;
 }
 
 .map__constituency:hover{
-  fill-opacity:.7;
+  fill-opacity:1;
+  z-index:2;
+  stroke:#202628;
 }
 
 .map__constituency--active{
-  fill:#FF0000;
+  fill-opacity:1;
 }
 

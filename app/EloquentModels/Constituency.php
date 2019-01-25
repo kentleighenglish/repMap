@@ -28,6 +28,11 @@ class Constituency extends Model
 		return $this->hasMany('RepMap\EloquentModels\Member');
 	}
 
+	public function electedMember()
+	{
+		return $this->hasOne('RepMap\EloquentModels\Member');
+	}
+
 	public function issueStances()
 	{
 		return $this->hasMany('RepMap\EloquentModels\IssueStance');

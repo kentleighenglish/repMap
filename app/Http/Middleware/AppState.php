@@ -19,26 +19,25 @@ class AppState
     {
 		$state  = [];
 
-		$data = Constituency::all()
-		->sortBy('name')
-		->values()
-		->load([
+		$data = Constituency::with([
 			'county',
-			'members' => function($query) {
-				$query
-				->where('elected', 1);
-			},
-			'members.party',
+			'electedMember',
+			'electedMember.party',
 			'issueStances'
 		])
+		->get()
+		->sortBy('name')
+		->values()
 		->keyBy('cty16cd')
 		->toArray();
 
 		$state['map'] = [
 			'constituencies' => $data,
-			'counties' => array_reduce($data, function($arr, $constituency) {
-				$arr[$constituency['county']['id']] = $constituency['county'];
+			'counties' => array_pluck($data, 'county', 'county.id'),
+			'parties' => array_reduce($data, function($arr, $constituency) {
+				$member = $constituency['elected_member'];
 
+				$arr[$member['party']['id']] = $member['party'];
 				return $arr;
 			}, [])
 		];

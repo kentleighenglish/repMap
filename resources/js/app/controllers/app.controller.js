@@ -1,4 +1,4 @@
-const { setActiveConstituency } = require('app/actions/filter');
+const { setActiveConstituency, setActiveCounty, setActiveParty } = require('app/actions/filter');
 
 class AppController {
 
@@ -7,21 +7,28 @@ class AppController {
 		$ngRedux.connect(this.mapStateToThis, this.mapDispatchToThis)(this);
 	}
 
-	mapStateToThis({ map: { constituencies }, filter }) {
+	mapStateToThis({ map: { constituencies, counties }, filter }) {
 		return {
 			constituencies,
+			counties,
 			filter
 		}
 	}
 
 	mapDispatchToThis(dispatch) {
 		return {
-			setActiveConstituency: (id) => dispatch(setActiveConstituency(id))
+			setActiveConstituency: (id) => dispatch(setActiveConstituency(id)),
+			setActiveCounty: (id) => dispatch(setActiveCounty(id)),
+			setActiveParty: (id) => dispatch(setActiveParty(id))
 		}
 	}
 
 	onConstituencyChange() {
 		this.setActiveConstituency(this.filter.activeConstituency);
+	}
+
+	onCountyChange() {
+		this.setActiveCounty(this.filter.activeCounty);
 	}
 
 }

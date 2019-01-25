@@ -9,7 +9,7 @@ const INITIAL_STATE = {
 }
 
 const createFeatures = constituencies => reduce(constituencies, (arr, c) => {
-	const { party: { id: party_id, colour } } = c.members[0];
+	const { party: { id: party_id, colour } } = c.elected_member;
 	const { id: county_id } = c.county;
 
 	const item = {
@@ -18,7 +18,7 @@ const createFeatures = constituencies => reduce(constituencies, (arr, c) => {
 		party_id,
 		type: 'Feature',
 		geometry: JSON.parse(c.geojson),
-		properties: { fill: colour ? '#262325' : null }
+		properties: { fill: colour || '#262325' }
 	}
 
 	return [
@@ -50,8 +50,7 @@ const calculateNewGeometry = state => {
 			return [
 				...arr,
 				{
-					id: f.id,
-					properties: f.properties,
+					...f,
 					geometry: geometryGenerator(f)
 				}
 			]

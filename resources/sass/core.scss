@@ -4,7 +4,10 @@ html, body {
 }
 
 body {
-	background: #191F21;
+	background: $grey-darkest;
+	color: $grey-lightest;
+	font-family: sans-serif;
+	font-size: 14px;
 	margin: 0;
 }
 
@@ -31,22 +34,5 @@ body {
 
 		justify-content: center;
 		align-items: center;
-	}
-}
-
-
-.map {
-	&__constituency {
-		stroke: #374549;
-		stroke-width: .2;
-		cursor: pointer;
-
-		&:hover {
-			fill-opacity: .7;
-		}
-
-		&--active {
-			fill: #FF0000;
-		}
 	}
 }

@@ -89613,7 +89613,9 @@ __webpack_require__("./resources/js/app/root.js");
 
 
 var FILTER_TYPES = {
-	SET_ACTIVE_CONSTITUENCY: 'FILTER//SET_ACTIVE_CONSTITUENCY'
+	SET_ACTIVE_CONSTITUENCY: 'FILTER@SET_ACTIVE_CONSTITUENCY',
+	SET_ACTIVE_COUNTY: 'FILTER@SET_ACTIVE_COUNTY',
+	SET_ACTIVE_PARTY: 'FILTER@SET_ACTIVE_PARTY'
 };
 
 var setActiveConstituency = function setActiveConstituency(key) {
@@ -89623,8 +89625,24 @@ var setActiveConstituency = function setActiveConstituency(key) {
 	};
 };
 
+var setActiveCounty = function setActiveCounty(key) {
+	return {
+		type: FILTER_TYPES.SET_ACTIVE_COUNTY,
+		key: key
+	};
+};
+
+var setActiveParty = function setActiveParty(key) {
+	return {
+		type: FILTER_TYPES.SET_ACTIVE_PARTY,
+		key: key
+	};
+};
+
 module.exports = {
 	setActiveConstituency: setActiveConstituency,
+	setActiveCounty: setActiveCounty,
+	setActiveParty: setActiveParty,
 	FILTER_TYPES: FILTER_TYPES
 };
 
@@ -89637,7 +89655,7 @@ module.exports = {
 
 
 var MAP_TYPES = {
-	RECEIVE_CONSTITUENCIES: 'MAP//RECEIVE_CONSTITUENCIES'
+	RECEIVE_CONSTITUENCIES: 'MAP@RECEIVE_CONSTITUENCIES'
 };
 
 module.exports = {
@@ -89752,57 +89770,7 @@ var MapComponentController = function () {
 module.exports = {
 	controller: ['$scope', '$ngRedux', MapComponentController],
 	controllerAs: 'vm',
-	template: ['<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg">', '<g class="map__group">', '<path ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" fill="{{ g.properties.fill }}" ng-click="vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="{ \'map__constituency--active\': vm.filter.activeConstituency === g.id }"></path>', '</g>', '</svg>'].join('')
-
-	// var width = 1000;
-	// var height = 1000;
-	//
-	// var geojson = {
-	// 	type: 'FeatureCollection',
-	// 	features: state.constituencies.reduce(function(arr, c) {
-	// 		var party = c.members[0].party;
-	//
-	// 		if (c.geojson) {
-	// 			var colour = '#191F21';
-	// 			// var colour = '#374549';
-	// 			if (colours[party.name]) {
-	// 				// colour = colours[party.name];
-	// 			}
-	//
-	// 			arr.push({
-	// 				type: 'Feature',
-	// 				geometry: JSON.parse(c.geojson),
-	// 				properties: { fill: colour, stroke: '#374549', strokeWidth: '.2' }
-	// 			});
-	// 		}
-	//
-	// 		return arr;
-	// 	}, [])
-	// };
-	//
-	// var projection = d3.geoAzimuthalEqualArea()
-	// .center([-1.9, 52.5])
-	// .fitSize([width, height], geojson);
-	//
-	// var geoGenerator = d3.geoPath()
-	// .projection(projection);
-	//
-	// d3.select('.map__group')
-	// .selectAll('path')
-	// .data(geojson.features)
-	// .enter()
-	// .append('path')
-	// .attr('d', geoGenerator)
-	// .style('fill', function(d) {
-	// 	return d.properties.fill
-	// })
-	// .style('stroke', function(d) {
-	// 	return d.properties.stroke
-	// })
-	// .style('stroke-width', function(d) {
-	// 	return d.properties.strokeWidth
-	// });
-
+	template: ['<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg">', '<g class="map__group">', '<path ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" ng-attr-fill="{{ g.properties.fill }}" ng-click="vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="{ \'map__constituency--active\': (vm.filter.activeConstituency === g.id  || vm.filter.activeCounty === g.county_id || vm.filter.activeParty === g.party_id ) }"></path>', '</g>', '</svg>'].join('')
 };
 
 /***/ }),
@@ -89845,7 +89813,9 @@ function _classCallCheck(instance, Constructor) {
 }
 
 var _require = __webpack_require__("./resources/js/app/actions/filter.js"),
-    _setActiveConstituency = _require.setActiveConstituency;
+    _setActiveConstituency = _require.setActiveConstituency,
+    _setActiveCounty = _require.setActiveCounty,
+    _setActiveParty = _require.setActiveParty;
 
 var AppController = function () {
 	function AppController($scope, $ngRedux) {
@@ -89857,11 +89827,14 @@ var AppController = function () {
 	_createClass(AppController, [{
 		key: 'mapStateToThis',
 		value: function mapStateToThis(_ref) {
-			var constituencies = _ref.map.constituencies,
+			var _ref$map = _ref.map,
+			    constituencies = _ref$map.constituencies,
+			    counties = _ref$map.counties,
 			    filter = _ref.filter;
 
 			return {
 				constituencies: constituencies,
+				counties: counties,
 				filter: filter
 			};
 		}
@@ -89871,6 +89844,12 @@ var AppController = function () {
 			return {
 				setActiveConstituency: function setActiveConstituency(id) {
 					return dispatch(_setActiveConstituency(id));
+				},
+				setActiveCounty: function setActiveCounty(id) {
+					return dispatch(_setActiveCounty(id));
+				},
+				setActiveParty: function setActiveParty(id) {
+					return dispatch(_setActiveParty(id));
 				}
 			};
 		}
@@ -89878,6 +89857,11 @@ var AppController = function () {
 		key: 'onConstituencyChange',
 		value: function onConstituencyChange() {
 			this.setActiveConstituency(this.filter.activeConstituency);
+		}
+	}, {
+		key: 'onCountyChange',
+		value: function onCountyChange() {
+			this.setActiveCounty(this.filter.activeCounty);
 		}
 	}]);
 
@@ -89894,11 +89878,23 @@ module.exports = ['$scope', '$ngRedux', AppController];
 "use strict";
 
 
+var _extends = Object.assign || function (target) {
+	for (var i = 1; i < arguments.length; i++) {
+		var source = arguments[i];for (var key in source) {
+			if (Object.prototype.hasOwnProperty.call(source, key)) {
+				target[key] = source[key];
+			}
+		}
+	}return target;
+};
+
 var _require = __webpack_require__("./resources/js/app/actions/filter.js"),
     FILTER_TYPES = _require.FILTER_TYPES;
 
 var INITIAL_STATE = {
-	activeConstituency: null
+	activeConstituency: null,
+	activeCounty: null,
+	activeParty: null
 };
 
 module.exports = function () {
@@ -89907,7 +89903,25 @@ module.exports = function () {
 
 	switch (action.type) {
 		case FILTER_TYPES.SET_ACTIVE_CONSTITUENCY:
-			state.activeConstituency = action.key ? action.key : null;
+			state = _extends({}, state, {
+				activeConstituency: action.key ? action.key : null,
+				activeCounty: null,
+				activeParty: null
+			});
+			break;
+		case FILTER_TYPES.SET_ACTIVE_COUNTY:
+			state = _extends({}, state, {
+				activeCounty: action.key ? action.key : null,
+				activeConstituency: null,
+				activeParty: null
+			});
+			break;
+		case FILTER_TYPES.SET_ACTIVE_PARTY:
+			state = _extends({}, state, {
+				activeParty: action.key ? action.key : null,
+				activeConstituency: null,
+				activeCounty: null
+			});
 			break;
 	}
 
@@ -89982,9 +89996,9 @@ var INITIAL_STATE = {
 
 var createFeatures = function createFeatures(constituencies) {
 	return reduce(constituencies, function (arr, c) {
-		var _c$members$0$party = c.members[0].party,
-		    party_id = _c$members$0$party.id,
-		    colour = _c$members$0$party.colour;
+		var _c$elected_member$par = c.elected_member.party,
+		    party_id = _c$elected_member$par.id,
+		    colour = _c$elected_member$par.colour;
 		var county_id = c.county.id;
 
 		var item = {
@@ -89993,7 +90007,7 @@ var createFeatures = function createFeatures(constituencies) {
 			party_id: party_id,
 			type: 'Feature',
 			geometry: JSON.parse(c.geojson),
-			properties: { fill: colour ? '#262325' : null }
+			properties: { fill: colour || '#262325' }
 		};
 
 		return [].concat(_toConsumableArray(arr), [item]);
@@ -90014,11 +90028,9 @@ var calculateNewGeometry = function calculateNewGeometry(state) {
 		var geometryGenerator = createGeometryGenerator(state, features);
 
 		state.geometry = reduce(features, function (arr, f) {
-			return [].concat(_toConsumableArray(arr), [{
-				id: f.id,
-				properties: f.properties,
+			return [].concat(_toConsumableArray(arr), [_extends({}, f, {
 				geometry: geometryGenerator(f)
-			}]);
+			})]);
 		}, []);
 	}
 
