@@ -43,14 +43,14 @@ class SyncService {
 		if ($result['statusCode'] === 200) {
 			$items = $result['data']['features'];
 
-			$constituencies = Constituency::all()->groupBy('cty16cd');
+			$constituencies = Constituency::all()->keyBy('cty16cd');
 
 			foreach($items as $item) {
 				$gsscode = $item->properties->pcon16cd;
-				if (isset($constituencies[$gsscode][0])) {
-					$constituencies[$gsscode][0]->geojson = json_encode($item->geometry);
+				if (isset($constituencies[$gsscode])) {
+					$constituencies[$gsscode]->geojson = json_encode($item->geometry);
 
-					$constituencies[$gsscode][0]->save();
+					$constituencies[$gsscode]->save();
 				}
 
 			}
@@ -159,7 +159,7 @@ class SyncService {
 		$results = $this->parliament->getMembers();
 
 		// Fetch All constituencies (used to save relationships later)
-		$constituencies	= Constituency::all()->groupBy('cty16cd')->toArray();
+		$constituencies	= Constituency::all()->keyBy('cty16cd')->toArray();
 
 		// Init empty arrays
 		$parsedResults = [];
@@ -183,7 +183,7 @@ class SyncService {
 
 			foreach ($resourceConstituencies as $c) {
 				if ($member['constituencyResource'] === $c['resourceId']) {
-					$constituency = isset($constituencies[$c['gsscode']][0]) ? $constituencies[$c['gsscode']][0] : null;
+					$constituency = isset($constituencies[$c['gsscode']]) ? $constituencies[$c['gsscode']] : null;
 
 					if ($constituency) {
 						$member['constituency_id'] = $constituency['id'];

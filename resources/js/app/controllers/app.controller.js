@@ -7,7 +7,7 @@ class AppController {
 		$ngRedux.connect(this.mapStateToThis, this.mapDispatchToThis)(this);
 	}
 
-	mapStateToThis({ constituencies, filter }) {
+	mapStateToThis({ map: { constituencies }, filter }) {
 		return {
 			constituencies,
 			filter

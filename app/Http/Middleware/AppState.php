@@ -30,9 +30,18 @@ class AppState
 			},
 			'members.party',
 			'issueStances'
-		]);
+		])
+		->keyBy('cty16cd')
+		->toArray();
 
-		$state['constituencies'] = $data;
+		$state['map'] = [
+			'constituencies' => $data,
+			'counties' => array_reduce($data, function($arr, $constituency) {
+				$arr[$constituency['county']['id']] = $constituency['county'];
+
+				return $arr;
+			}, [])
+		];
 
 		View::share('viewState', (Object) $state);
 

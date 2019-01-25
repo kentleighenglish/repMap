@@ -1,38 +1,19 @@
 const { setActiveConstituency } = require('app/actions/filter');
-const { reduce } = require('lodash');
 
 class MapComponentController {
 
-	constructor($ngRedux, d3Service) {
-		$ngRedux.connect(this.mapStateToThis, this.mapDispatchToThis)(this);
-		this.d3 = d3Service;
+	constructor($scope, $ngRedux) {
+		this.$scope = $scope;
 
-		this.width = 1000;
-		this.height = 1000;
+		$ngRedux.connect(this.mapStateToThis, this.mapDispatchToThis)(this);
 
 	}
 
-	mapStateToThis({ constituencies, filter }) {
+	mapStateToThis({ map: { width, height, geometry }, filter }) {
 		return {
-			items: reduce(constituencies, (arr, c) => {
-				const { party: { colour } } = c.members[0];
-
-				const item = {
-					id: c.id,
-					type: 'Feature',
-					geometry: JSON.parse(c.geojson),
-					properties: { fill: colour ? '#262325' : null }
-				}
-
-				if (filter.activeConstituency === c.id) {
-					item.active = true;
-				}
-
-				return [
-					...arr,
-					item
-				];
-			}, []),
+			width,
+			height,
+			geometry,
 			filter
 		}
 	}
@@ -43,34 +24,19 @@ class MapComponentController {
 		}
 	}
 
-	$onInit() {
-		this.geometryGenerator = this.createGeometryGenerator();
-	}
-
-	createGeometryGenerator() {
-		var projection = this.d3.geoAzimuthalEqualArea()
-		.center([-1.9, 52.5])
-		.fitSize([this.width, this.height], { type: 'FeatureCollection', features: this.items });
-
-		var geoGenerator = this.d3.geoPath()
-		.projection(projection);
-
-		return geoGenerator;
-	}
-
-	onConstituencyClick(c) {
-		this.setActive(c.id);
+	onConstituencyClick(key) {
+		this.setActive(key);
 	}
 
 }
 
 module.exports = {
-	controller: [ '$ngRedux', 'd3Service', MapComponentController ],
+	controller: [ '$scope', '$ngRedux', MapComponentController ],
 	controllerAs: 'vm',
 	template: [
 		'<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg">',
 			'<g class="map__group">',
-				'<path ng-repeat="g in vm.items track by g.id" ng-attr-d="{{ vm.geometryGenerator(g) }}" fill="{{ g.properties.fill }}" ng-click="vm.onConstituencyClick(g)" class="map__constituency" ng-class="{ \'map__constituency--active\': !!g.active }"></path>',
+				'<path ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" fill="{{ g.properties.fill }}" ng-click="vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="{ \'map__constituency--active\': vm.filter.activeConstituency === g.id }"></path>',
 			'</g>',
 		'</svg>'
 	].join('')

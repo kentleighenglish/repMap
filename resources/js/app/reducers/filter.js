@@ -7,7 +7,7 @@ const INITIAL_STATE = {
 module.exports = (state = INITIAL_STATE, action) => {
 	switch(action.type) {
 		case FILTER_TYPES.SET_ACTIVE_CONSTITUENCY:
-			state.activeConstituency = action.id ? action.id : null;
+			state.activeConstituency = action.key ? action.key : null;
 		break;
 	}
 

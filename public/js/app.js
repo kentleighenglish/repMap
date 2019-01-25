@@ -89606,22 +89606,6 @@ __webpack_require__("./resources/js/app/root.js");
 
 /***/ }),
 
-/***/ "./resources/js/app/actions/constituencies.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var CONSTITUENCIES_TYPES = {
-	RECEIVE_CONSTITUENCIES: 'CONSTITUENCIES//RECEIVE_CONSTITUENCIES'
-};
-
-module.exports = {
-	CONSTITUENCIES_TYPES: CONSTITUENCIES_TYPES
-};
-
-/***/ }),
-
 /***/ "./resources/js/app/actions/filter.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -89632,16 +89616,32 @@ var FILTER_TYPES = {
 	SET_ACTIVE_CONSTITUENCY: 'FILTER//SET_ACTIVE_CONSTITUENCY'
 };
 
-var setActiveConstituency = function setActiveConstituency(id) {
+var setActiveConstituency = function setActiveConstituency(key) {
 	return {
 		type: FILTER_TYPES.SET_ACTIVE_CONSTITUENCY,
-		id: id
+		key: key
 	};
 };
 
 module.exports = {
 	setActiveConstituency: setActiveConstituency,
 	FILTER_TYPES: FILTER_TYPES
+};
+
+/***/ }),
+
+/***/ "./resources/js/app/actions/map.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var MAP_TYPES = {
+	RECEIVE_CONSTITUENCIES: 'MAP//RECEIVE_CONSTITUENCIES'
+};
+
+module.exports = {
+	MAP_TYPES: MAP_TYPES
 };
 
 /***/ }),
@@ -89696,16 +89696,6 @@ var _createClass = function () {
 	};
 }();
 
-function _toConsumableArray(arr) {
-	if (Array.isArray(arr)) {
-		for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
-			arr2[i] = arr[i];
-		}return arr2;
-	} else {
-		return Array.from(arr);
-	}
-}
-
 function _classCallCheck(instance, Constructor) {
 	if (!(instance instanceof Constructor)) {
 		throw new TypeError("Cannot call a class as a function");
@@ -89715,43 +89705,28 @@ function _classCallCheck(instance, Constructor) {
 var _require = __webpack_require__("./resources/js/app/actions/filter.js"),
     setActiveConstituency = _require.setActiveConstituency;
 
-var _require2 = __webpack_require__("./node_modules/lodash/lodash.js"),
-    reduce = _require2.reduce;
-
 var MapComponentController = function () {
-	function MapComponentController($ngRedux, d3Service) {
+	function MapComponentController($scope, $ngRedux) {
 		_classCallCheck(this, MapComponentController);
 
-		$ngRedux.connect(this.mapStateToThis, this.mapDispatchToThis)(this);
-		this.d3 = d3Service;
+		this.$scope = $scope;
 
-		this.width = 1000;
-		this.height = 1000;
+		$ngRedux.connect(this.mapStateToThis, this.mapDispatchToThis)(this);
 	}
 
 	_createClass(MapComponentController, [{
 		key: 'mapStateToThis',
 		value: function mapStateToThis(_ref) {
-			var constituencies = _ref.constituencies,
+			var _ref$map = _ref.map,
+			    width = _ref$map.width,
+			    height = _ref$map.height,
+			    geometry = _ref$map.geometry,
 			    filter = _ref.filter;
 
 			return {
-				items: reduce(constituencies, function (arr, c) {
-					var colour = c.members[0].party.colour;
-
-					var item = {
-						id: c.id,
-						type: 'Feature',
-						geometry: JSON.parse(c.geojson),
-						properties: { fill: colour ? '#262325' : null }
-					};
-
-					if (filter.activeConstituency === c.id) {
-						item.active = true;
-					}
-
-					return [].concat(_toConsumableArray(arr), [item]);
-				}, []),
+				width: width,
+				height: height,
+				geometry: geometry,
 				filter: filter
 			};
 		}
@@ -89765,23 +89740,9 @@ var MapComponentController = function () {
 			};
 		}
 	}, {
-		key: '$onInit',
-		value: function $onInit() {
-			this.geometryGenerator = this.createGeometryGenerator();
-		}
-	}, {
-		key: 'createGeometryGenerator',
-		value: function createGeometryGenerator() {
-			var projection = this.d3.geoAzimuthalEqualArea().center([-1.9, 52.5]).fitSize([this.width, this.height], { type: 'FeatureCollection', features: this.items });
-
-			var geoGenerator = this.d3.geoPath().projection(projection);
-
-			return geoGenerator;
-		}
-	}, {
 		key: 'onConstituencyClick',
-		value: function onConstituencyClick(c) {
-			this.setActive(c.id);
+		value: function onConstituencyClick(key) {
+			this.setActive(key);
 		}
 	}]);
 
@@ -89789,9 +89750,9 @@ var MapComponentController = function () {
 }();
 
 module.exports = {
-	controller: ['$ngRedux', 'd3Service', MapComponentController],
+	controller: ['$scope', '$ngRedux', MapComponentController],
 	controllerAs: 'vm',
-	template: ['<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg">', '<g class="map__group">', '<path ng-repeat="g in vm.items track by g.id" ng-attr-d="{{ vm.geometryGenerator(g) }}" fill="{{ g.properties.fill }}" ng-click="vm.onConstituencyClick(g)" class="map__constituency" ng-class="{ \'map__constituency--active\': !!g.active }"></path>', '</g>', '</svg>'].join('')
+	template: ['<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg">', '<g class="map__group">', '<path ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" fill="{{ g.properties.fill }}" ng-click="vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="{ \'map__constituency--active\': vm.filter.activeConstituency === g.id }"></path>', '</g>', '</svg>'].join('')
 
 	// var width = 1000;
 	// var height = 1000;
@@ -89896,7 +89857,7 @@ var AppController = function () {
 	_createClass(AppController, [{
 		key: 'mapStateToThis',
 		value: function mapStateToThis(_ref) {
-			var constituencies = _ref.constituencies,
+			var constituencies = _ref.map.constituencies,
 			    filter = _ref.filter;
 
 			return {
@@ -89927,31 +89888,6 @@ module.exports = ['$scope', '$ngRedux', AppController];
 
 /***/ }),
 
-/***/ "./resources/js/app/reducers/constituencies.js":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _require = __webpack_require__("./resources/js/app/actions/constituencies.js"),
-    CONSTITUENCIES_TYPES = _require.CONSTITUENCIES_TYPES;
-
-var INITIAL_STATE = [];
-
-module.exports = function () {
-	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : INITIAL_STATE;
-	var action = arguments[1];
-
-	switch (action.type) {
-		case CONSTITUENCIES_TYPES.RECEIVE_CONSTITUENCIES:
-			state = action.items;
-			break;
-	}
-	return state;
-};
-
-/***/ }),
-
 /***/ "./resources/js/app/reducers/filter.js":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -89971,7 +89907,7 @@ module.exports = function () {
 
 	switch (action.type) {
 		case FILTER_TYPES.SET_ACTIVE_CONSTITUENCY:
-			state.activeConstituency = action.id ? action.id : null;
+			state.activeConstituency = action.key ? action.key : null;
 			break;
 	}
 
@@ -89989,18 +89925,127 @@ module.exports = function () {
 var _require = __webpack_require__("./node_modules/redux/es/redux.js"),
     combineReducers = _require.combineReducers;
 
-var constituencies = __webpack_require__("./resources/js/app/reducers/constituencies.js");
+var map = __webpack_require__("./resources/js/app/reducers/map.js");
 var filter = __webpack_require__("./resources/js/app/reducers/filter.js");
 // const issues = require('./issues');
 
 module.exports = combineReducers({
-	constituencies: constituencies,
+	map: map,
 	filter: filter,
 	issues: function issues() {
 		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 		return state;
 	}
 });
+
+/***/ }),
+
+/***/ "./resources/js/app/reducers/map.js":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _extends = Object.assign || function (target) {
+	for (var i = 1; i < arguments.length; i++) {
+		var source = arguments[i];for (var key in source) {
+			if (Object.prototype.hasOwnProperty.call(source, key)) {
+				target[key] = source[key];
+			}
+		}
+	}return target;
+};
+
+function _toConsumableArray(arr) {
+	if (Array.isArray(arr)) {
+		for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+			arr2[i] = arr[i];
+		}return arr2;
+	} else {
+		return Array.from(arr);
+	}
+}
+
+var _require = __webpack_require__("./resources/js/app/actions/map.js"),
+    MAP_TYPES = _require.MAP_TYPES;
+
+var _require2 = __webpack_require__("./node_modules/lodash/lodash.js"),
+    reduce = _require2.reduce;
+
+var d3 = __webpack_require__("./node_modules/d3/index.js");
+
+var INITIAL_STATE = {
+	width: 1000,
+	height: 1000,
+	constituencies: []
+};
+
+var createFeatures = function createFeatures(constituencies) {
+	return reduce(constituencies, function (arr, c) {
+		var _c$members$0$party = c.members[0].party,
+		    party_id = _c$members$0$party.id,
+		    colour = _c$members$0$party.colour;
+		var county_id = c.county.id;
+
+		var item = {
+			id: c.cty16cd,
+			county_id: county_id,
+			party_id: party_id,
+			type: 'Feature',
+			geometry: JSON.parse(c.geojson),
+			properties: { fill: colour ? '#262325' : null }
+		};
+
+		return [].concat(_toConsumableArray(arr), [item]);
+	}, []);
+};
+
+var createGeometryGenerator = function createGeometryGenerator(state, features) {
+	var projection = d3.geoAzimuthalEqualArea().center([-1.9, 52.5]).fitSize([state.width, state.height], { type: 'FeatureCollection', features: features });
+
+	var geoGenerator = d3.geoPath().projection(projection);
+
+	return geoGenerator;
+};
+
+var calculateNewGeometry = function calculateNewGeometry(state) {
+	var features = createFeatures(state.constituencies);
+	if (features.length) {
+		var geometryGenerator = createGeometryGenerator(state, features);
+
+		state.geometry = reduce(features, function (arr, f) {
+			return [].concat(_toConsumableArray(arr), [{
+				id: f.id,
+				properties: f.properties,
+				geometry: geometryGenerator(f)
+			}]);
+		}, []);
+	}
+
+	return state;
+};
+
+module.exports = function () {
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : INITIAL_STATE;
+	var action = arguments[1];
+
+	switch (action.type) {
+		case MAP_TYPES.RECEIVE_CONSTITUENCIES:
+			state.constituencies = action.items;
+			break;
+		case MAP_TYPES.RECALCULATE_GEOMETRY:
+			if (state.constituencies) {
+				calculateNewGeometry(state);
+			}
+			break;
+	}
+
+	if (state.width && state.height && !state.geometry && state.constituencies) {
+		state = calculateNewGeometry(state);
+	}
+
+	return _extends({}, INITIAL_STATE, state);
+};
 
 /***/ }),
 
@@ -90020,60 +90065,6 @@ function _toConsumableArray(arr) {
   }
 }
 
-var d3 = __webpack_require__("./node_modules/d3/index.js");
-
-var state = window.__INITIAL_STATE__;
-
-// var width = 1000;
-// var height = 1000;
-//
-// var geojson = {
-// 	type: 'FeatureCollection',
-// 	features: state.constituencies.reduce(function(arr, c) {
-// 		var party = c.members[0].party;
-//
-// 		if (c.geojson) {
-// 			var colour = '#191F21';
-// 			// var colour = '#374549';
-// 			if (colours[party.name]) {
-// 				// colour = colours[party.name];
-// 			}
-//
-// 			arr.push({
-// 				type: 'Feature',
-// 				geometry: JSON.parse(c.geojson),
-// 				properties: { fill: colour, stroke: '#374549', strokeWidth: '.2' }
-// 			});
-// 		}
-//
-// 		return arr;
-// 	}, [])
-// };
-//
-// var projection = d3.geoAzimuthalEqualArea()
-// .center([-1.9, 52.5])
-// .fitSize([width, height], geojson);
-//
-// var geoGenerator = d3.geoPath()
-// .projection(projection);
-//
-// d3.select('.map__group')
-// .selectAll('path')
-// .data(geojson.features)
-// .enter()
-// .append('path')
-// .attr('d', geoGenerator)
-// .style('fill', function(d) {
-// 	return d.properties.fill
-// })
-// .style('stroke', function(d) {
-// 	return d.properties.stroke
-// })
-// .style('stroke-width', function(d) {
-// 	return d.properties.strokeWidth
-// });
-
-
 var _require = __webpack_require__("./node_modules/angular/index.js"),
     _module = _require.module,
     bootstrap = _require.bootstrap;
@@ -90089,8 +90080,10 @@ var thunk = __webpack_require__("./node_modules/redux-thunk/es/index.js").defaul
 
 __webpack_require__("./node_modules/ng-redux/es/ng-redux.js");
 
+// External Libraries
 var axios = __webpack_require__("./node_modules/axios/index.js");
 var _ = __webpack_require__("./node_modules/lodash/lodash.js");
+var d3 = __webpack_require__("./node_modules/d3/index.js");
 
 __webpack_require__("./resources/js/app/app.module.js");
 

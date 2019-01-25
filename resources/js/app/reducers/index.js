@@ -1,11 +1,11 @@
 const { combineReducers } = require('redux');
 
-const constituencies = require('./constituencies');
+const map = require('./map');
 const filter = require('./filter');
 // const issues = require('./issues');
 
 module.exports = combineReducers({
-	constituencies,
-	filter: filter,
+	map,
+	filter,
 	issues: (state = {}) => state
 });

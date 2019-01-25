@@ -1,0 +1,9 @@
+
+const MAP_TYPES = {
+	RECEIVE_CONSTITUENCIES: 'MAP//RECEIVE_CONSTITUENCIES'
+}
+
+
+module.exports = {
+	MAP_TYPES
+}

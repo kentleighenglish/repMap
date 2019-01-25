@@ -10,7 +10,7 @@
 				<label>Constituency</label>
 				<select ng-model="app.filter.activeConstituency" ng-change="app.onConstituencyChange()">
 					<option disabled selected ng-value="null">Select One</option>
-					<option ng-repeat="c in app.constituencies" ng-value="c.id">@{{ c.name }}</option>
+					<option ng-repeat="(key, c) in app.constituencies" ng-value="key">@{{ c.name }}</option>
 				</select>
 			</aside>
 			<section class="mapContainer">
