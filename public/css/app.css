@@ -56,6 +56,7 @@ body{
 }
 
 .map__constituency{
+  fill:#697475;
   stroke:#2B3233;
   stroke-width:.5;
   cursor:pointer;
@@ -70,5 +71,12 @@ body{
 
 .map__constituency--active{
   fill-opacity:1;
+}
+
+.map__nonconstituency{
+  fill:#697475;
+  stroke:#2B3233;
+  stroke-width:.5;
+  fill-opacity:.4;
 }
 

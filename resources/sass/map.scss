@@ -1,6 +1,7 @@
 
 .map {
 	&__constituency {
+		fill: $grey;
 		stroke: $grey-darker;
 		stroke-width: .5;
 		cursor: pointer;
@@ -15,5 +16,12 @@
 		&--active {
 			fill-opacity: 1;
 		}
+	}
+
+	&__nonconstituency {
+		fill: $grey;
+		stroke: $grey-darker;
+		stroke-width: .5;
+		fill-opacity: .4;
 	}
 }

@@ -7,10 +7,11 @@ class AppController {
 		$ngRedux.connect(this.mapStateToThis, this.mapDispatchToThis)(this);
 	}
 
-	mapStateToThis({ map: { constituencies, counties }, filter }) {
+	mapStateToThis({ map: { constituencies, counties, parties }, filter }) {
 		return {
 			constituencies,
 			counties,
+			parties,
 			filter
 		}
 	}

@@ -89830,11 +89830,13 @@ var AppController = function () {
 			var _ref$map = _ref.map,
 			    constituencies = _ref$map.constituencies,
 			    counties = _ref$map.counties,
+			    parties = _ref$map.parties,
 			    filter = _ref.filter;
 
 			return {
 				constituencies: constituencies,
 				counties: counties,
+				parties: parties,
 				filter: filter
 			};
 		}
