@@ -24,8 +24,8 @@ class CreateMembersTable extends Migration
             $table->float('representation')->nullable(true);
             $table->timestamps();
 
-			$table->foreign('party_id')->references('id')->on('parties');
-			$table->foreign('constituency_id')->references('id')->on('constituencies');
+			$table->foreign('party_id')->references('id')->on('parties')->onDelete('cascade');
+			$table->foreign('constituency_id')->references('id')->on('constituencies')->onDelete('cascade');
         });
     }
 

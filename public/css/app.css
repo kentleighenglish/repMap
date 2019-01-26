@@ -56,21 +56,23 @@ body{
 }
 
 .map__constituency{
-  fill:#697475;
-  stroke:#2B3233;
-  stroke-width:.5;
+  fill:#2B3233;
+  stroke:#202628;
+  stroke-width:.3;
   cursor:pointer;
-  fill-opacity:.4;
+  fill-opacity:1;
+  -webkit-filter:drop-shadow(16px 16px 20px red);
+  filter:drop-shadow(16px 16px 20px red) .map__constituency;
 }
 
-.map__constituency:hover{
+.map__constituency :hover{
   fill-opacity:1;
   z-index:2;
   stroke:#202628;
 }
 
 .map__constituency--active{
-  fill-opacity:1;
+  fill:currentColor;
 }
 
 .map__nonconstituency{

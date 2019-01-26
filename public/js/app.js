@@ -89770,7 +89770,7 @@ var MapComponentController = function () {
 module.exports = {
 	controller: ['$scope', '$ngRedux', MapComponentController],
 	controllerAs: 'vm',
-	template: ['<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg">', '<g class="map__group">', '<path ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" ng-attr-fill="{{ g.properties.fill }}" ng-click="vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="{ \'map__constituency--active\': (vm.filter.activeConstituency === g.id  || vm.filter.activeCounty === g.county_id || vm.filter.activeParty === g.party_id ) }"></path>', '</g>', '</svg>'].join('')
+	template: ['<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg">', '<g class="map__group">', '<path ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" ng-style="{ color: g.properties.fill }" ng-click="vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="{ \'map__constituency--active\': (vm.filter.activeConstituency === g.id  || vm.filter.activeCounty === g.county_id || vm.filter.activeParty === g.party_id ) }"></path>', '</g>', '</svg>'].join('')
 };
 
 /***/ }),
@@ -89864,6 +89864,11 @@ var AppController = function () {
 		key: 'onCountyChange',
 		value: function onCountyChange() {
 			this.setActiveCounty(this.filter.activeCounty);
+		}
+	}, {
+		key: 'onPartyChange',
+		value: function onPartyChange() {
+			this.setActiveParty(this.filter.activeParty);
 		}
 	}]);
 

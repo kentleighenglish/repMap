@@ -33,6 +33,12 @@ class SyncService {
 		$this->ons = $ons;
 	}
 
+	public function clearAll()
+	{
+		DB::table('parties')->delete();
+		DB::table('counties')->delete();
+	}
+
 	public function updateGeoJson()
 	{
 		$api = new AbstractApi();
@@ -54,8 +60,8 @@ class SyncService {
 				}
 
 			}
-
 		}
+
 	}
 
 	/**
@@ -65,6 +71,7 @@ class SyncService {
 	 */
 	public function updateCounties()
 	{
+
 		$results = $this->ons->getActiveCounties();
 
 		$existing = County::all();
@@ -154,7 +161,7 @@ class SyncService {
 	 */
 	public function updateMembers()
 	{
-		DB::table('members')->delete();
+		DB::Table('members')->delete();
 
 		$results = $this->parliament->getMembers();
 
@@ -228,10 +235,10 @@ class SyncService {
 
 		}
 
-		$partyMembers = $this->updateParties($parsedResults);
+		$partiesResponse = $this->updateParties($parsedResults);
 
 		$newMembers = [];
-		foreach($partyMembers as $partyId => $members) {
+		foreach($partiesResponse['members'] as $partyId => $members) {
 			foreach($members as $member) {
 				$member['party_id'] = $partyId;
 				$newMembers[] = $member;
@@ -242,7 +249,8 @@ class SyncService {
 
 		return [
 			'success' => !!$success,
-			'count' => count($newMembers)
+			'count' => count($newMembers),
+			'partyCount' => $partiesResponse['count']
 		];
 	}
 
@@ -286,7 +294,10 @@ class SyncService {
 			$membersResponse[$newParty->id] = $members;
 		}
 
-		return $membersResponse;
+		return [
+			'count' => count($parties),
+			'members' => $membersResponse
+		];
 	}
 
 	private function _searchCollection($collection, $property, $value)

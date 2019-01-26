@@ -32,6 +32,10 @@ class AppController {
 		this.setActiveCounty(this.filter.activeCounty);
 	}
 
+	onPartyChange() {
+		this.setActiveParty(this.filter.activeParty);
+	}
+
 }
 
 module.exports = ['$scope', '$ngRedux', AppController];
