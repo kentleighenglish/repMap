@@ -1,11 +1,16 @@
 const { MAP_TYPES } = require('../actions/map');
-const { reduce } = require('lodash');
+const { reduce, flatten } = require('lodash');
 const d3 = require('d3');
 
 const INITIAL_STATE = {
 	width: 1000,
 	height: 1000,
-	constituencies: []
+	constituencies: {},
+	geometry: null,
+	counties: [],
+	parties: [],
+	extra: [],
+	extraGeometry: null
 }
 
 const createFeatures = constituencies => reduce(constituencies, (arr, c) => {
@@ -28,10 +33,10 @@ const createFeatures = constituencies => reduce(constituencies, (arr, c) => {
 }, []);
 
 
-const createGeometryGenerator = (state, features) => {
+const createGeometryGenerator = ({ width, height, center }, data) => {
 	var projection = d3.geoAzimuthalEqualArea()
-	.center([-1.9, 52.5])
-	.fitSize([state.width, state.height], { type: 'FeatureCollection', features: features });
+	.center(center)
+	.fitSize([width, height], data);
 
 	var geoGenerator = d3.geoPath()
 	.projection(projection);
@@ -39,12 +44,11 @@ const createGeometryGenerator = (state, features) => {
 	return geoGenerator;
 }
 
-
-
 const calculateNewGeometry = state => {
+	const { width, height } = state;
 	var features = createFeatures(state.constituencies);
 	if (features.length) {
-		var geometryGenerator = createGeometryGenerator(state, features);
+		var geometryGenerator = createGeometryGenerator({ width, height, center: [-1.9, 52.5] }, { type: 'FeatureCollection', features: features });
 
 		state.geometry = reduce(features, (arr, f) => {
 			return [
@@ -56,6 +60,35 @@ const calculateNewGeometry = state => {
 			]
 		}, []);
 	}
+
+	return state;
+};
+
+const calculateExtraGeometry = state => {
+	const { width, height } = state;
+	state.extraGeometry = flatten(reduce(state.extra, (geo, collection) => {
+		var features = collection.features;
+
+		if (features.length ) {
+			var geometryGenerator = createGeometryGenerator({ width: width, height: height, center: [-7.4, 53.5] }, collection);
+
+			var geometry = reduce(features, (arr, f) => {
+				return [
+					...arr,
+					{
+						...f,
+						geometry: geometryGenerator(f)
+					}
+				]
+			}, []);
+
+			if (geometry.length) {
+				geo.push(geometry);
+			}
+		}
+
+		return geo;
+	}, []));
 
 	return state;
 };
@@ -76,6 +109,10 @@ module.exports = (state = INITIAL_STATE, action) => {
 
 	if (state.width && state.height && !state.geometry && state.constituencies) {
 		state = calculateNewGeometry(state);
+	}
+
+	if (state.width && state.height && state.extra && state.extra.length && !state.extraGeometry) {
+		// state = calculateExtraGeometry(state);
 	}
 
 	return {
