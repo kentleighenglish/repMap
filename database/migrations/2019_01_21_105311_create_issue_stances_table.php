@@ -15,9 +15,9 @@ class CreateIssueStancesTable extends Migration
     {
         Schema::create('issue_stances', function (Blueprint $table) {
             $table->increments('id');
-			$table->unsignedInteger('constituency_id');
-            $table->unsignedInteger('member_id');
-            $table->unsignedInteger('issue_id');
+			$table->unsignedInteger('constituency_id')->nullable(true);
+            $table->unsignedInteger('member_id')->nullable(true);
+            $table->unsignedInteger('issue_id')->nullable(true);
             $table->unsignedInteger('electorate')->nullable(true);
             $table->unsignedInteger('turnout')->nullable(true);
             $table->unsignedTinyInteger('member_representing')->nullable(true);
@@ -25,9 +25,9 @@ class CreateIssueStancesTable extends Migration
             $table->string('constituency_stance', 255)->nullable(true);
             $table->timestamps();
 
-			$table->foreign('constituency_id')->references('id')->on('constituencies');
-			$table->foreign('member_id')->references('id')->on('members');
-			$table->foreign('issue_id')->references('id')->on('issues');
+			$table->foreign('constituency_id')->references('id')->on('constituencies')->onDelete('set null');
+			$table->foreign('member_id')->references('id')->on('members')->onDelete('set null');
+			$table->foreign('issue_id')->references('id')->on('issues')->onDelete('set null');
         });
     }
 

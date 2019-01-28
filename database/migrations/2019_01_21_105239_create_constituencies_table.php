@@ -22,7 +22,7 @@ class CreateConstituenciesTable extends Migration
             $table->float('representation')->nullable(true);
             $table->timestamps();
 
-			$table->foreign('county_id')->references('id')->on('counties');
+			$table->foreign('county_id')->references('id')->on('counties')->onDelete('cascade');
         });
     }
 

@@ -1,11 +1,13 @@
 
 .map {
 	&__constituency {
-		// fill: $grey;
-		stroke: $grey-darker;
-		stroke-width: .5;
+		fill: $grey-darker;
+		stroke: $grey-darkest;
+		stroke-width: .3;
 		cursor: pointer;
-		fill-opacity: .4;
+		fill-opacity: 1;
+		-webkit-filter: drop-shadow(16px 16px 20px red);
+		filter: drop-shadow(16px 16px 20px red)
 
 		&:hover {
 			fill-opacity: 1;
@@ -14,7 +16,7 @@
 		}
 
 		&--active {
-			fill-opacity: 1;
+			fill: currentColor;
 		}
 	}
 

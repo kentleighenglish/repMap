@@ -4,16 +4,11 @@ namespace RepMap\Http\Controllers;
 
 use RepMap\Http\Controllers\Controller;
 
-use RepMap\Services\SyncService;
-
 class PageController extends Controller
 {
 
-	public $sync;
-
-	public function __construct(SyncService $sync)
+	public function __construct()
 	{
-		$this->sync = $sync;
 	}
 
 	/**
@@ -23,11 +18,6 @@ class PageController extends Controller
 	 */
 	public function index()
 	{
-		// $this->sync->updateCounties();
-		// $this->sync->updateConstituencies();
-		// $this->sync->updateMembers();
-		// $this->sync->updateGeoJson();
-
 		return view('index');
 	}
 
