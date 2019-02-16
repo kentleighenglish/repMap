@@ -9,11 +9,12 @@ class MapComponentController {
 
 	}
 
-	mapStateToThis({ map: { width, height, geometry }, filter }) {
+	mapStateToThis({ map: { width, height, geometry, extraGeometry }, filter }) {
 		return {
 			width,
 			height,
 			geometry,
+			extraGeometry,
 			filter
 		}
 	}
@@ -37,6 +38,7 @@ module.exports = {
 		'<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg">',
 			'<g class="map__group">',
 				'<path ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" ng-style="{ color: g.properties.fill }" ng-click="vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="{ \'map__constituency--active\': (vm.filter.activeConstituency === g.id  || vm.filter.activeCounty === g.county_id || vm.filter.activeParty === g.party_id ) }"></path>',
+				'<path ng-repeat="g in vm.extraGeometry track by $index" ng-attr-d="{{ g.geometry }}" class="map__nonconstituency"></path>',
 			'</g>',
 		'</svg>'
 	].join('')

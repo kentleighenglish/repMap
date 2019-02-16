@@ -1,4 +1,19 @@
 
+input, select, textarea {
+	width: 100%;
+	font-size: 16px;
+	padding: ($gap / 2) ($gap / 4);
+
+	&:active, &:focus {
+		outline: none;
+	}
+}
+
 select {
-	background: $grey-darker;
+	background: none;
+	font-size: 16px;
+	height: 30px;
+	color: $primary;
+	border: 1px solid $grey-darker;
+	border: none;
 }

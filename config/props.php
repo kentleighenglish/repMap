@@ -5,6 +5,9 @@ return [
 	"lastGeneralElectionId" => "730039",
 	// URL to fetch geojson for United Kingdom (dated 2016)
 	"geoJsonUrl" => "http://geoportal1-ons.opendata.arcgis.com/datasets/48d0b49ff7ec4ad0a4f7f8188f6143e8_3.geojson",
+	"geoJsonExtra" => [
+		'http://data-osi.opendata.arcgis.com/datasets/d87613be0d494b118c577683dc31eb14_2.geojson'
+	],
 	"issueMethods" => [
 		"electoralResults" => [
 			"label" => "Electoral Results API",
