@@ -18,7 +18,7 @@ class CreateConstituenciesTable extends Migration
             $table->string('name', 255);
             $table->string('cty16cd', 16);
 			$table->unsignedInteger('county_id');
-            $table->text('geojson')->nullable(true);
+            $table->longText('geojson')->nullable(true);
             $table->float('representation')->nullable(true);
             $table->timestamps();
 
