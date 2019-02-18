@@ -23,6 +23,11 @@ class Constituency extends Model
 		return $this->belongsTo('RepMap\EloquentModels\County');
 	}
 
+	public function geometry()
+	{
+		return $this->hasOne('RepMap\EloquentModels\Geometry');
+	}
+
 	public function members()
 	{
 		return $this->hasMany('RepMap\EloquentModels\Member');

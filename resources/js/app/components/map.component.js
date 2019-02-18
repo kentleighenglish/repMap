@@ -9,7 +9,7 @@ class MapComponentController {
 
 	}
 
-	mapStateToThis({ map: { width, height, geometry, extraGeometry }, filter }) {
+	mapStateToThis({ map: { width, height, parsedGeometry: geometry, extraGeometry }, filter }) {
 		return {
 			width,
 			height,
@@ -29,6 +29,13 @@ class MapComponentController {
 		this.setActive(key);
 	}
 
+	classObject(g) {
+		return {
+			'map__constituency--active': this.filter.activeConstituency === g.id  || this.filter.activeCounty === g.county_id || this.filter.activeParty === g.party_id,
+			'map__constituency--foreign': !g.id
+		}
+	}
+
 }
 
 module.exports = {
@@ -37,7 +44,7 @@ module.exports = {
 	template: [
 		'<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg">',
 			'<g class="map__group">',
-				'<path ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" ng-style="{ color: g.properties.fill }" ng-click="vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="{ \'map__constituency--active\': (vm.filter.activeConstituency === g.id  || vm.filter.activeCounty === g.county_id || vm.filter.activeParty === g.party_id ) }"></path>',
+				'<path ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" ng-style="{ color: g.properties.fill }" ng-click="g.id && vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="vm.classObject(g)"></path>',
 				'<path ng-repeat="g in vm.extraGeometry track by $index" ng-attr-d="{{ g.geometry }}" class="map__nonconstituency"></path>',
 			'</g>',
 		'</svg>'

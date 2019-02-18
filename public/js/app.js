@@ -89738,13 +89738,15 @@ var MapComponentController = function () {
 			var _ref$map = _ref.map,
 			    width = _ref$map.width,
 			    height = _ref$map.height,
-			    geometry = _ref$map.geometry,
+			    geometry = _ref$map.parsedGeometry,
+			    extraGeometry = _ref$map.extraGeometry,
 			    filter = _ref.filter;
 
 			return {
 				width: width,
 				height: height,
 				geometry: geometry,
+				extraGeometry: extraGeometry,
 				filter: filter
 			};
 		}
@@ -89762,6 +89764,14 @@ var MapComponentController = function () {
 		value: function onConstituencyClick(key) {
 			this.setActive(key);
 		}
+	}, {
+		key: 'classObject',
+		value: function classObject(g) {
+			return {
+				'map__constituency--active': this.filter.activeConstituency === g.id || this.filter.activeCounty === g.county_id || this.filter.activeParty === g.party_id,
+				'map__constituency--foreign': !g.id
+			};
+		}
 	}]);
 
 	return MapComponentController;
@@ -89770,7 +89780,7 @@ var MapComponentController = function () {
 module.exports = {
 	controller: ['$scope', '$ngRedux', MapComponentController],
 	controllerAs: 'vm',
-	template: ['<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg">', '<g class="map__group">', '<path ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" ng-style="{ color: g.properties.fill }" ng-click="vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="{ \'map__constituency--active\': (vm.filter.activeConstituency === g.id  || vm.filter.activeCounty === g.county_id || vm.filter.activeParty === g.party_id ) }"></path>', '</g>', '</svg>'].join('')
+	template: ['<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg">', '<g class="map__group">', '<path ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" ng-style="{ color: g.properties.fill }" ng-click="g.id && vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="vm.classObject(g)"></path>', '<path ng-repeat="g in vm.extraGeometry track by $index" ng-attr-d="{{ g.geometry }}" class="map__nonconstituency"></path>', '</g>', '</svg>'].join('')
 };
 
 /***/ }),
@@ -89991,38 +90001,52 @@ var _require = __webpack_require__("./resources/js/app/actions/map.js"),
     MAP_TYPES = _require.MAP_TYPES;
 
 var _require2 = __webpack_require__("./node_modules/lodash/lodash.js"),
-    reduce = _require2.reduce;
+    reduce = _require2.reduce,
+    find = _require2.find;
 
 var d3 = __webpack_require__("./node_modules/d3/index.js");
 
 var INITIAL_STATE = {
 	width: 1000,
 	height: 1000,
-	constituencies: []
+	constituencies: {},
+	geometry: [],
+	parsedGeometry: null,
+	counties: [],
+	parties: []
 };
 
-var createFeatures = function createFeatures(constituencies) {
-	return reduce(constituencies, function (arr, c) {
-		var _c$elected_member$par = c.elected_member.party,
-		    party_id = _c$elected_member$par.id,
-		    colour = _c$elected_member$par.colour;
-		var county_id = c.county.id;
-
+var createFeatures = function createFeatures(geometry, constituencies) {
+	return reduce(geometry, function (arr, g) {
 		var item = {
-			id: c.cty16cd,
-			county_id: county_id,
-			party_id: party_id,
 			type: 'Feature',
-			geometry: JSON.parse(c.geojson),
-			properties: { fill: colour || '#262325' }
+			geometry: JSON.parse(g.geojson),
+			properties: { fill: '#262325' }
 		};
+
+		if (g.constituency_id && find(constituencies, { id: g.constituency_id })) {
+			var c = find(constituencies, { id: g.constituency_id });
+			var _c$elected_member$par = c.elected_member.party,
+			    party_id = _c$elected_member$par.id,
+			    colour = _c$elected_member$par.colour;
+			var county_id = c.county.id;
+
+			item.id = c.cty16cd;
+			item.county_id = county_id;
+			item.party_id = party_id;
+			item.properties = { fill: colour || '#262325' };
+		}
 
 		return [].concat(_toConsumableArray(arr), [item]);
 	}, []);
 };
 
-var createGeometryGenerator = function createGeometryGenerator(state, features) {
-	var projection = d3.geoAzimuthalEqualArea().center([-1.9, 52.5]).fitSize([state.width, state.height], { type: 'FeatureCollection', features: features });
+var createGeometryGenerator = function createGeometryGenerator(_ref, data) {
+	var width = _ref.width,
+	    height = _ref.height,
+	    center = _ref.center;
+
+	var projection = d3.geoAzimuthalEqualArea().center(center).fitSize([width, height], data);
 
 	var geoGenerator = d3.geoPath().projection(projection);
 
@@ -90030,11 +90054,14 @@ var createGeometryGenerator = function createGeometryGenerator(state, features) 
 };
 
 var calculateNewGeometry = function calculateNewGeometry(state) {
-	var features = createFeatures(state.constituencies);
-	if (features.length) {
-		var geometryGenerator = createGeometryGenerator(state, features);
+	var width = state.width,
+	    height = state.height;
 
-		state.geometry = reduce(features, function (arr, f) {
+	var features = createFeatures(state.geometry, state.constituencies);
+	if (features.length) {
+		var geometryGenerator = createGeometryGenerator({ width: width, height: height, center: [-1.9, 52.5] }, { type: 'FeatureCollection', features: features });
+
+		state.parsedGeometry = reduce(features, function (arr, f) {
 			return [].concat(_toConsumableArray(arr), [_extends({}, f, {
 				geometry: geometryGenerator(f)
 			})]);
@@ -90059,7 +90086,7 @@ module.exports = function () {
 			break;
 	}
 
-	if (state.width && state.height && !state.geometry && state.constituencies) {
+	if (state.width && state.height && !state.parsedGeometry && state.geometry) {
 		state = calculateNewGeometry(state);
 	}
 

@@ -4,6 +4,7 @@ namespace RepMap\Http\Middleware;
 
 use Illuminate\Support\Facades\View;
 use RepMap\EloquentModels\Constituency;
+use RepMap\EloquentModels\Geometry;
 use RepMap\Services\AbstractApi;
 use Closure;
 
@@ -32,22 +33,13 @@ class AppState
 		->keyBy('cty16cd')
 		->toArray();
 
-		$extraMaps = config('props.geoJsonExtra');
+		$geometry = Geometry::all();
+
 		$api = new AbstractApi();
-		$nonconstituencies = [];
-
-		foreach($extraMaps as $url) {
-			$response = $api->get($url);
-
-			if ($response['statusCode'] === 200) {
-				$collection = $response['data'];
-				$nonconstituencies[] = $collection;
-			}
-		}
 
 		$state['map'] = [
 			'constituencies' => $data,
-			'extra' => $nonconstituencies,
+			'geometry' => $geometry,
 			'counties' => array_values(array_pluck($data, 'county', 'county.id')),
 			'parties' => array_values(array_reduce($data, function($arr, $constituency) {
 				$member = $constituency['elected_member'];

@@ -15,6 +15,7 @@ use RepMap\EloquentModels\County;
 use RepMap\EloquentModels\Constituency;
 use RepMap\EloquentModels\Member;
 use RepMap\EloquentModels\Party;
+use RepMap\EloquentModels\Geometry;
 
 class SyncService {
 
@@ -43,23 +44,32 @@ class SyncService {
 	{
 		$api = new AbstractApi();
 
-		$url = config('props.geoJsonUrl');
-		$result = $api->get($url);
+		$geojson = config('props.geojson');
+		$items = [];
 
-		if ($result['statusCode'] === 200) {
-			$items = $result['data']['features'];
+		foreach($geojson as $url) {
+			$result = $api->get($url);
 
-			$constituencies = Constituency::all()->keyBy('cty16cd');
+			if ($result['statusCode'] === 200) {
+				$items = array_merge($items, $result['data']['features']);
+			}
+		}
 
-			foreach($items as $item) {
+		$constituencies = Constituency::all()->keyBy('cty16cd');
+
+		foreach($items as $item) {
+			$geometry = new Geometry();
+
+			$geometry->geojson = json_encode($item->geometry);
+
+			if (isset($item->properties->pcon16cd)) {
 				$gsscode = $item->properties->pcon16cd;
 				if (isset($constituencies[$gsscode])) {
-					$constituencies[$gsscode]->geojson = json_encode($item->geometry);
-
-					$constituencies[$gsscode]->save();
+					$geometry->constituency_id = $constituencies[$gsscode]->id;
 				}
-
 			}
+
+			$geometry->save();
 		}
 
 	}

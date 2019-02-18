@@ -1,29 +1,33 @@
 const { MAP_TYPES } = require('../actions/map');
-const { reduce, flatten } = require('lodash');
+const { reduce, find } = require('lodash');
 const d3 = require('d3');
 
 const INITIAL_STATE = {
 	width: 1000,
 	height: 1000,
 	constituencies: {},
-	geometry: null,
+	geometry: [],
+	parsedGeometry: null,
 	counties: [],
 	parties: [],
-	extra: [],
-	extraGeometry: null
 }
 
-const createFeatures = constituencies => reduce(constituencies, (arr, c) => {
-	const { party: { id: party_id, colour } } = c.elected_member;
-	const { id: county_id } = c.county;
-
+const createFeatures = (geometry, constituencies) => reduce(geometry, (arr, g) => {
 	const item = {
-		id: c.cty16cd,
-		county_id,
-		party_id,
 		type: 'Feature',
-		geometry: JSON.parse(c.geojson),
-		properties: { fill: colour || '#262325' }
+		geometry: JSON.parse(g.geojson),
+		properties: { fill: '#262325' }
+	}
+
+	if (g.constituency_id && find(constituencies, { id: g.constituency_id })) {
+		const c = find(constituencies, { id: g.constituency_id });
+		const { party: { id: party_id, colour } } = c.elected_member;
+		const { id: county_id } = c.county;
+
+		item.id = c.cty16cd;
+		item.county_id = county_id;
+		item.party_id = party_id;
+		item.properties =  { fill: colour || '#262325' }
 	}
 
 	return [
@@ -46,11 +50,11 @@ const createGeometryGenerator = ({ width, height, center }, data) => {
 
 const calculateNewGeometry = state => {
 	const { width, height } = state;
-	var features = createFeatures(state.constituencies);
+	var features = createFeatures(state.geometry, state.constituencies);
 	if (features.length) {
 		var geometryGenerator = createGeometryGenerator({ width, height, center: [-1.9, 52.5] }, { type: 'FeatureCollection', features: features });
 
-		state.geometry = reduce(features, (arr, f) => {
+		state.parsedGeometry = reduce(features, (arr, f) => {
 			return [
 				...arr,
 				{
@@ -60,35 +64,6 @@ const calculateNewGeometry = state => {
 			]
 		}, []);
 	}
-
-	return state;
-};
-
-const calculateExtraGeometry = state => {
-	const { width, height } = state;
-	state.extraGeometry = flatten(reduce(state.extra, (geo, collection) => {
-		var features = collection.features;
-
-		if (features.length ) {
-			var geometryGenerator = createGeometryGenerator({ width: width, height: height, center: [-7.4, 53.5] }, collection);
-
-			var geometry = reduce(features, (arr, f) => {
-				return [
-					...arr,
-					{
-						...f,
-						geometry: geometryGenerator(f)
-					}
-				]
-			}, []);
-
-			if (geometry.length) {
-				geo.push(geometry);
-			}
-		}
-
-		return geo;
-	}, []));
 
 	return state;
 };
@@ -107,12 +82,8 @@ module.exports = (state = INITIAL_STATE, action) => {
 	}
 
 
-	if (state.width && state.height && !state.geometry && state.constituencies) {
+	if (state.width && state.height && !state.parsedGeometry && state.geometry) {
 		state = calculateNewGeometry(state);
-	}
-
-	if (state.width && state.height && state.extra && state.extra.length && !state.extraGeometry) {
-		// state = calculateExtraGeometry(state);
 	}
 
 	return {
