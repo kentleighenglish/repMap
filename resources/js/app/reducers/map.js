@@ -21,7 +21,7 @@ const createFeatures = (geometry, constituencies) => reduce(geometry, (arr, g) =
 
 	if (g.constituency_id && find(constituencies, { id: g.constituency_id })) {
 		const c = find(constituencies, { id: g.constituency_id });
-		const { party: { id: party_id, colour } } = c.elected_member;
+		const { party: { id: party_id = null, colour = null } = {} } = c.elected_member ? c.elected_member : {};
 		const { id: county_id } = c.county;
 
 		item.id = c.cty16cd;

@@ -42,9 +42,11 @@ class AppState
 			'geometry' => $geometry,
 			'counties' => array_values(array_pluck($data, 'county', 'county.id')),
 			'parties' => array_values(array_reduce($data, function($arr, $constituency) {
-				$member = $constituency['elected_member'];
+				if (isset($constituency['elected_member'])) {
+					$member = $constituency['elected_member'];
 
-				$arr[$member['party']['id']] = $member['party'];
+					$arr[$member['party']['id']] = $member['party'];
+				}
 				return $arr;
 			}, []))
 		];

@@ -89769,7 +89769,7 @@ var MapComponentController = function () {
 		value: function classObject(g) {
 			return {
 				'map__constituency--active': this.filter.activeConstituency === g.id || this.filter.activeCounty === g.county_id || this.filter.activeParty === g.party_id,
-				'map__constituency--foreign': !g.id
+				'map__constituency--foreign': !g.id || !g.party_id
 			};
 		}
 	}]);
@@ -90026,9 +90026,15 @@ var createFeatures = function createFeatures(geometry, constituencies) {
 
 		if (g.constituency_id && find(constituencies, { id: g.constituency_id })) {
 			var c = find(constituencies, { id: g.constituency_id });
-			var _c$elected_member$par = c.elected_member.party,
-			    party_id = _c$elected_member$par.id,
-			    colour = _c$elected_member$par.colour;
+
+			var _ref = c.elected_member ? c.elected_member : {},
+			    _ref$party = _ref.party;
+
+			_ref$party = _ref$party === undefined ? {} : _ref$party;
+			var _ref$party$id = _ref$party.id,
+			    party_id = _ref$party$id === undefined ? null : _ref$party$id,
+			    _ref$party$colour = _ref$party.colour,
+			    colour = _ref$party$colour === undefined ? null : _ref$party$colour;
 			var county_id = c.county.id;
 
 			item.id = c.cty16cd;
@@ -90041,10 +90047,10 @@ var createFeatures = function createFeatures(geometry, constituencies) {
 	}, []);
 };
 
-var createGeometryGenerator = function createGeometryGenerator(_ref, data) {
-	var width = _ref.width,
-	    height = _ref.height,
-	    center = _ref.center;
+var createGeometryGenerator = function createGeometryGenerator(_ref2, data) {
+	var width = _ref2.width,
+	    height = _ref2.height,
+	    center = _ref2.center;
 
 	var projection = d3.geoAzimuthalEqualArea().center(center).fitSize([width, height], data);
 

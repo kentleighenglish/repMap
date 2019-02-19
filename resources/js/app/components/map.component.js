@@ -32,7 +32,7 @@ class MapComponentController {
 	classObject(g) {
 		return {
 			'map__constituency--active': this.filter.activeConstituency === g.id  || this.filter.activeCounty === g.county_id || this.filter.activeParty === g.party_id,
-			'map__constituency--foreign': !g.id
+			'map__constituency--foreign': !g.id || !g.party_id
 		}
 	}
 
