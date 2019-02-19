@@ -19,7 +19,8 @@ mix.disableNotifications();
 mix.webpackConfig({
     resolve: {
         alias: {
-			'app': path.resolve(__dirname, 'resources', 'js', 'app')
+			'app': path.resolve(__dirname, 'resources', 'js', 'app'),
+			'admin': path.resolve(__dirname, 'resources', 'js', 'admin')
         }
     },
 	module: {
@@ -39,6 +40,7 @@ mix.webpackConfig({
 mix
 .eslint()
 .js('resources/js/app.js', 'public/js').version()
+.js('resources/js/admin.js', 'public/js').version()
 .sass('resources/sass/app.scss', 'public/css').version()
 .options({
 	postCss: [
