@@ -28,6 +28,9 @@
 		<section class="mapContainer">
 			<map class="map"></map>
 		</section>
+		<aside class="stats">
+
+		</aside>
 	</div>
 @endsection
 

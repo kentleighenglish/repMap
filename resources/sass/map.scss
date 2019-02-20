@@ -20,7 +20,7 @@
 		}
 
 		&--foreign {
-			fill: darken($grey-darker, 3%);
+			fill: lighten($grey-darkest, 1.5%);
 			stroke: darken($grey-darker, 4%);
 			stroke-width: .5;
 			fill-opacity: 1;
