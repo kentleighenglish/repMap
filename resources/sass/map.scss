@@ -1,13 +1,15 @@
 
 .map {
+	&__svg {
+		padding-left: 20%;
+	}
+
 	&__constituency {
 		fill: $grey-darker;
 		stroke: $grey-darkest;
 		stroke-width: .3;
 		cursor: pointer;
 		fill-opacity: 1;
-		-webkit-filter: drop-shadow(16px 16px 20px red);
-		filter: drop-shadow(16px 16px 20px red)
 
 		&:hover {
 			fill-opacity: 1;

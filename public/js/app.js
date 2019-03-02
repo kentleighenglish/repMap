@@ -89615,7 +89615,8 @@ __webpack_require__("./resources/js/app/root.js");
 var FILTER_TYPES = {
 	SET_ACTIVE_CONSTITUENCY: 'FILTER@SET_ACTIVE_CONSTITUENCY',
 	SET_ACTIVE_COUNTY: 'FILTER@SET_ACTIVE_COUNTY',
-	SET_ACTIVE_PARTY: 'FILTER@SET_ACTIVE_PARTY'
+	SET_ACTIVE_PARTY: 'FILTER@SET_ACTIVE_PARTY',
+	RESET_FILTER: 'FILTER@RESET_FILTER'
 };
 
 var setActiveConstituency = function setActiveConstituency(key) {
@@ -89639,10 +89640,17 @@ var setActiveParty = function setActiveParty(key) {
 	};
 };
 
+var resetFilter = function resetFilter() {
+	return {
+		type: FILTER_TYPES.RESET_FILTER
+	};
+};
+
 module.exports = {
 	setActiveConstituency: setActiveConstituency,
 	setActiveCounty: setActiveCounty,
 	setActiveParty: setActiveParty,
+	resetFilter: resetFilter,
 	FILTER_TYPES: FILTER_TYPES
 };
 
@@ -89655,11 +89663,20 @@ module.exports = {
 
 
 var MAP_TYPES = {
-	RECEIVE_CONSTITUENCIES: 'MAP@RECEIVE_CONSTITUENCIES'
+	RECEIVE_CONSTITUENCIES: 'MAP@RECEIVE_CONSTITUENCIES',
+	RESIZE_MAP: 'MAP@RESIZE_MAP'
+};
+
+var resizeMap = function resizeMap(size) {
+	return {
+		type: MAP_TYPES.RESIZE_MAP,
+		size: size
+	};
 };
 
 module.exports = {
-	MAP_TYPES: MAP_TYPES
+	MAP_TYPES: MAP_TYPES,
+	resizeMap: resizeMap
 };
 
 /***/ }),
@@ -89733,12 +89750,15 @@ function _classCallCheck(instance, Constructor) {
 var _require = __webpack_require__("./resources/js/app/actions/filter.js"),
     setActiveConstituency = _require.setActiveConstituency;
 
+var _require2 = __webpack_require__("./resources/js/app/actions/map.js"),
+    _resizeMap = _require2.resizeMap;
+
 var d3 = __webpack_require__("./node_modules/d3/index.js");
 
-var _require2 = __webpack_require__("./node_modules/lodash/lodash.js"),
-    find = _require2.find,
-    filter = _require2.filter,
-    reduce = _require2.reduce;
+var _require3 = __webpack_require__("./node_modules/lodash/lodash.js"),
+    find = _require3.find,
+    filter = _require3.filter,
+    reduce = _require3.reduce;
 
 var MapComponentController = function () {
 	function MapComponentController($scope, $ngRedux) {
@@ -89775,6 +89795,9 @@ var MapComponentController = function () {
 			return {
 				setActive: function setActive(id) {
 					return dispatch(setActiveConstituency(id));
+				},
+				resizeMap: function resizeMap(size) {
+					return dispatch(_resizeMap(size));
 				}
 			};
 		}
@@ -89783,20 +89806,23 @@ var MapComponentController = function () {
 		value: function $onInit() {
 			var _this = this;
 
+			// window.addEventListener('resize', () => {
+			// 	this.resizeMap({ width: window.innerWidth, height: window.innerHeight });
+			// });
+			// this.resizeMap({ width: window.innerWidth, height: window.innerHeight });
+
 			this.mapProps = {
 				x: d3.scaleLinear().domain([0, this.width]).range([0, this.width]),
 				y: d3.scaleLinear().domain([0, this.height]).range([this.height, 0]),
 				scaleExtent: [1, 8]
 			};
-			this.transformMap = 'translate(0, 0)';
 
 			this.zoom = d3.zoom().scaleExtent(this.mapProps.scaleExtent).on('zoom', function () {
 				return _this.redraw();
 			});
 
-			d3.select('#mapSvg').selectAll('path').attr("transform", function (d) {
-				return "translate(" + d + ")";
-			});
+			// d3.select('#mapSvg').selectAll('path')
+			// .attr("transform", (d) => ("translate("+d+")"));
 
 			d3.select('#mapSvg').call(this.zoom);
 
@@ -89809,7 +89835,7 @@ var MapComponentController = function () {
 	}, {
 		key: 'redraw',
 		value: function redraw() {
-			d3.select('#mapSvg').select('g').attr("transform", d3.event.transform);
+			d3.select('#mapSvg').select('.map__group').attr("transform", d3.event.transform);
 		}
 	}, {
 		key: 'onConstituencyClick',
@@ -89904,12 +89930,15 @@ var MapComponentController = function () {
 		key: 'zoomToBounds',
 		value: function zoomToBounds(bounds) {
 			if (bounds) {
+				var width = this.width,
+				    height = this.height;
+
 				var dx = bounds[1][0] - bounds[0][0],
 				    dy = bounds[1][1] - bounds[0][1],
 				    x = (bounds[0][0] + bounds[1][0]) / 2,
 				    y = (bounds[0][1] + bounds[1][1]) / 2,
-				    scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / this.width, dy / this.height))),
-				    translate = [this.width / 2 - scale * x, this.height / 2 - scale * y];
+				    scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / width, dy / height))),
+				    translate = [width / 2 - scale * x, height / 2 - scale * y];
 
 				if (!isNaN(translate[0]) && !isNaN(translate[1])) {
 					d3.select('#mapSvg').transition().duration(750).call(this.zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
@@ -89974,7 +90003,8 @@ function _classCallCheck(instance, Constructor) {
 var _require = __webpack_require__("./resources/js/app/actions/filter.js"),
     _setActiveConstituency = _require.setActiveConstituency,
     _setActiveCounty = _require.setActiveCounty,
-    _setActiveParty = _require.setActiveParty;
+    _setActiveParty = _require.setActiveParty,
+    _resetFilter = _require.resetFilter;
 
 var _require2 = __webpack_require__("./node_modules/lodash/lodash.js"),
     cloneDeep = _require2.cloneDeep;
@@ -90014,6 +90044,9 @@ var AppController = function () {
 				},
 				setActiveParty: function setActiveParty(id) {
 					return dispatch(_setActiveParty(id));
+				},
+				resetFilter: function resetFilter() {
+					return dispatch(_resetFilter());
 				}
 			};
 		}
@@ -90074,6 +90107,9 @@ module.exports = function () {
 	var action = arguments[1];
 
 	switch (action.type) {
+		case FILTER_TYPES.RESET_FILTER:
+			state = cloneDeep(INITIAL_STATE);
+			break;
 		case FILTER_TYPES.SET_ACTIVE_CONSTITUENCY:
 			state = _extends({}, state, {
 				activeConstituency: action.key && action.key !== state.activeConstituency ? action.key : null,
@@ -90246,6 +90282,15 @@ module.exports = function () {
 				calculateNewGeometry(state);
 			}
 			break;
+		case MAP_TYPES.RESIZE_MAP:
+			var _action$size = action.size,
+			    width = _action$size.width,
+			    height = _action$size.height;
+
+			state = _extends({}, state, {
+				width: width,
+				height: height
+			});
 	}
 
 	if (state.width && state.height && !state.parsedGeometry && state.geometry) {

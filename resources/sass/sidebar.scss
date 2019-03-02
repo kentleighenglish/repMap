@@ -1,4 +1,16 @@
 
 aside.sidebar {
-	padding: $gap ($gap / 2);
+	display: flex;
+	flex-direction: column;
+	width: 20%;
+
+	.resetButton {
+		margin-bottom: $gap;
+	}
+}
+
+aside.stats {
+	display: flex;
+	flex-direction: column;
+	width: 20%;
 }

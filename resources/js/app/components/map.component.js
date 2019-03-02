@@ -1,4 +1,5 @@
 const { setActiveConstituency } = require('app/actions/filter');
+const { resizeMap } = require('app/actions/map');
 const d3 = require('d3');
 const { find, filter, reduce } = require('lodash');
 
@@ -24,22 +25,27 @@ class MapComponentController {
 
 	mapDispatchToThis(dispatch) {
 		return {
-			setActive: (id) => dispatch(setActiveConstituency(id))
+			setActive: (id) => dispatch(setActiveConstituency(id)),
+			resizeMap: size => dispatch(resizeMap(size))
 		}
 	}
 
 	$onInit() {
+		// window.addEventListener('resize', () => {
+		// 	this.resizeMap({ width: window.innerWidth, height: window.innerHeight });
+		// });
+		// this.resizeMap({ width: window.innerWidth, height: window.innerHeight });
+
 		this.mapProps = {
 			x: d3.scaleLinear().domain([0, this.width]).range([0, this.width]),
 			y: d3.scaleLinear().domain([0, this.height]).range([this.height, 0]),
 			scaleExtent: [ 1, 8 ]
 		}
-		this.transformMap = 'translate(0, 0)';
 
 		this.zoom = d3.zoom().scaleExtent( this.mapProps.scaleExtent ).on('zoom', () => this.redraw());
 
-		d3.select('#mapSvg').selectAll('path')
-		.attr("transform", (d) => ("translate("+d+")"));
+		// d3.select('#mapSvg').selectAll('path')
+		// .attr("transform", (d) => ("translate("+d+")"));
 
 		d3.select('#mapSvg')
 		.call( this.zoom )
@@ -50,7 +56,7 @@ class MapComponentController {
 	}
 
 	redraw() {
-		d3.select('#mapSvg').select('g').attr("transform", d3.event.transform);
+		d3.select('#mapSvg').select('.map__group').attr("transform", d3.event.transform);
 	}
 
 	onConstituencyClick(key) {
@@ -134,12 +140,14 @@ class MapComponentController {
 
 	zoomToBounds(bounds) {
 		if (bounds) {
+			const { width, height } = this;
+
 			var dx = bounds[1][0] - bounds[0][0],
 			dy = bounds[1][1] - bounds[0][1],
 			x = (bounds[0][0] + bounds [1][0]) / 2,
 			y = (bounds[0][1] + bounds[1][1]) / 2,
-			scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / this.width, dy / this.height))),
-			translate = [ this.width / 2 - scale * x, this.height / 2 - scale * y];
+			scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / width, dy / height))),
+			translate = [ width / 2 - scale * x, height / 2 - scale * y];
 
 			if (!isNaN(translate[0]) && !isNaN(translate[1])) {
 				d3.select('#mapSvg')

@@ -80,6 +80,14 @@ module.exports = (state = INITIAL_STATE, action) => {
 				calculateNewGeometry(state);
 			}
 		break;
+		case MAP_TYPES.RESIZE_MAP:
+			const { width, height } = action.size;
+
+			state = {
+				...state,
+				width,
+				height
+			}
 	}
 
 

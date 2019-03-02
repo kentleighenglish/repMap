@@ -1,6 +1,7 @@
 
 input, select, textarea {
 	width: 100%;
+	font-family: $font-default;
 	font-size: 16px;
 	padding: ($gap / 2) ($gap / 4);
 
@@ -16,4 +17,26 @@ select {
 	color: $primary;
 	border: 1px solid $grey-darker;
 	border: none;
+}
+
+button {
+	background: $grey-darkest;
+	border: 1px solid $primary;
+	padding: ($gap / 4) $gap;
+	color: $primary;
+	font-size: 16px;
+	font-weight: 400;
+
+	&:hover {
+		border-color: $primary-light;
+		color: $primary-light;
+
+		&:not([disabled]) {
+			cursor: pointer;
+		}
+	}
+
+	&:active, &:focus {
+		outline: none;
+	}
 }

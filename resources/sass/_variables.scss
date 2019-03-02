@@ -1,5 +1,6 @@
 
 $primary: #966C5D;
+$primary-light: lighten($primary, 10%);
 
 $grey-darkest: #202628;
 $grey-darker: #2B3233;
@@ -8,6 +9,9 @@ $grey: #697475;
 $grey-light: #859193;
 $grey-lighter: #A7B5B7;
 $grey-lightest: #C2CCD1;
+
+$font-default: "Raleway", sans-serif;
+$font-alternate: "Catamaran", sans-serif;
 
 $bg: #191F21;
 

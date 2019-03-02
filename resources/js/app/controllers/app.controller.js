@@ -1,4 +1,4 @@
-const { setActiveConstituency, setActiveCounty, setActiveParty } = require('app/actions/filter');
+const { setActiveConstituency, setActiveCounty, setActiveParty, resetFilter } = require('app/actions/filter');
 const { cloneDeep } = require('lodash');
 
 class AppController {
@@ -21,7 +21,8 @@ class AppController {
 		return {
 			setActiveConstituency: (id) => dispatch(setActiveConstituency(id)),
 			setActiveCounty: (id) => dispatch(setActiveCounty(id)),
-			setActiveParty: (id) => dispatch(setActiveParty(id))
+			setActiveParty: (id) => dispatch(setActiveParty(id)),
+			resetFilter: () => dispatch(resetFilter())
 		}
 	}
 

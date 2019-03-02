@@ -9,6 +9,9 @@ const INITIAL_STATE = {
 
 module.exports = (state = cloneDeep(INITIAL_STATE), action) => {
 	switch(action.type) {
+		case FILTER_TYPES.RESET_FILTER:
+			state = cloneDeep(INITIAL_STATE);
+		break;
 		case FILTER_TYPES.SET_ACTIVE_CONSTITUENCY:
 			state = {
 				...state,

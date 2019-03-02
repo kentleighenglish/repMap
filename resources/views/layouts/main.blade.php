@@ -2,6 +2,8 @@
 <html>
 	<head>
 		<title>Representation Map</title>
+
+		<link href="https://fonts.googleapis.com/css?family=Catamaran:400,700|Raleway:300,400" rel="stylesheet">
 		<link href="/css/app.css" rel="stylesheet" />
 	</head>
 	<body>
