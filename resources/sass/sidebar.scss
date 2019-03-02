@@ -2,7 +2,7 @@
 aside.sidebar {
 	display: flex;
 	flex-direction: column;
-	width: 20%;
+	width: $sidebar-width;
 
 	.resetButton {
 		margin-bottom: $gap;
@@ -12,5 +12,5 @@ aside.sidebar {
 aside.stats {
 	display: flex;
 	flex-direction: column;
-	width: 20%;
+	width: $sidebar-width;
 }

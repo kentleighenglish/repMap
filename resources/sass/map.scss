@@ -1,7 +1,7 @@
 
 .map {
-	&__svg {
-		padding-left: 20%;
+	&__svg>g {
+		transform: translateX($sidebar-width);
 	}
 
 	&__constituency {

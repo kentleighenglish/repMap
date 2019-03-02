@@ -168,9 +168,11 @@ module.exports = {
 	controllerAs: 'vm',
 	template: [
 		'<svg ng-attr-width="{{vm.width}}" ng-attr-height="{{vm.height}}" class="map__svg" id="mapSvg">',
-			'<g class="map__group">',
-				'<path id="{{ g.id }}" ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" ng-style="{ color: g.properties.fill }" ng-click="g.id && vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="vm.classObject(g)"></path>',
-				'<path ng-repeat="g in vm.extraGeometry track by $index" ng-attr-d="{{ g.geometry }}" class="map__nonconstituency"></path>',
+			'<g>',
+				'<g class="map__group">',
+					'<path id="{{ g.id }}" ng-repeat="g in vm.geometry track by $index" ng-attr-d="{{ g.geometry }}" ng-style="{ color: g.properties.fill }" ng-click="g.id && vm.onConstituencyClick(g.id)" class="map__constituency" ng-class="vm.classObject(g)"></path>',
+					'<path ng-repeat="g in vm.extraGeometry track by $index" ng-attr-d="{{ g.geometry }}" class="map__nonconstituency"></path>',
+				'</g>',
 			'</g>',
 		'</svg>'
 	].join('')

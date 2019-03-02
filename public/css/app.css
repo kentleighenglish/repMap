@@ -89,8 +89,9 @@ h3{
   width:100%;
 }
 
-.map__svg{
-  padding-left:20%;
+.map__svg > g{
+  -webkit-transform:translateX(20%);
+          transform:translateX(20%);
 }
 
 .map__constituency{
