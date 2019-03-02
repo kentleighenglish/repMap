@@ -59,7 +59,8 @@ const calculateNewGeometry = state => {
 				...arr,
 				{
 					...f,
-					geometry: geometryGenerator(f)
+					geometry: geometryGenerator(f),
+					bounds: geometryGenerator.bounds(f)
 				}
 			]
 		}, []);

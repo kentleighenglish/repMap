@@ -1,4 +1,5 @@
 const { FILTER_TYPES } = require('../actions/filter');
+const { cloneDeep } = require('lodash');
 
 const INITIAL_STATE = {
 	activeConstituency: null,
@@ -6,12 +7,12 @@ const INITIAL_STATE = {
 	activeParty: null
 }
 
-module.exports = (state = INITIAL_STATE, action) => {
+module.exports = (state = cloneDeep(INITIAL_STATE), action) => {
 	switch(action.type) {
 		case FILTER_TYPES.SET_ACTIVE_CONSTITUENCY:
 			state = {
 				...state,
-				activeConstituency: action.key ? action.key : null,
+				activeConstituency: (action.key && action.key !== state.activeConstituency) ? action.key : null,
 				activeCounty: null,
 				activeParty: null
 			}

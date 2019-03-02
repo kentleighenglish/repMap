@@ -1,4 +1,5 @@
 const { setActiveConstituency, setActiveCounty, setActiveParty } = require('app/actions/filter');
+const { cloneDeep } = require('lodash');
 
 class AppController {
 
@@ -12,7 +13,7 @@ class AppController {
 			constituencies,
 			counties,
 			parties,
-			filter
+			filter: cloneDeep(filter)
 		}
 	}
 

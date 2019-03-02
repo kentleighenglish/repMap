@@ -56,6 +56,7 @@ body{
       -ms-flex-direction:column;
           flex-direction:column;
   width:85%;
+  overflow:hidden;
   -webkit-box-pack:center;
       -ms-flex-pack:center;
           justify-content:center;
